@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from '@/utils/axios';
 
-export default function Usuarios() {
+export default function SecretarioUsuarios() {
     const [userInfo, setUserInfo] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -39,7 +39,7 @@ export default function Usuarios() {
     const fetchResidents = async () => {
         try {
             setLoading(true);
-            const res = await axios.get('/api/resident/');
+            const res = await axios.get('/api/user/');
             setUserInfo(res.data);
         } catch (err) {
             console.error(err);
@@ -90,7 +90,7 @@ export default function Usuarios() {
         if (!selectedUser) return;
 
         try {
-            await axios.delete(`/api/resident/${selectedUser._id}`);
+            await axios.delete(`/api/user/${selectedUser._id}`);
             setUserInfo(userInfo.filter(u => u._id !== selectedUser._id));
             setModalOpen(false);
             alert('Usuario eliminado correctamente');
@@ -130,7 +130,7 @@ export default function Usuarios() {
             {/* HEADER + BUSCADOR */}
             <div className="mb-6 flex flex-col md:flex-row md:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">
-                    Residentes de la comunidad
+                    Secretario de la comunidad
                 </h2>
 
                 <input

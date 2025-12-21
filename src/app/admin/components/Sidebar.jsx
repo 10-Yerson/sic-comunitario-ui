@@ -3,8 +3,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FiUsers, FiSettings, FiFileText, FiHome, FiCheckCircle, FiLogOut } from "react-icons/fi";
-import axios from '../../../utils/axios'; 
+import { FiUsers, FiSettings, FiFileText, FiHome, FiCheckCircle, FiLogOut, FiClipboard, FiUserPlus } from "react-icons/fi";
+import axios from '@/utils/axios'; 
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -28,8 +28,9 @@ export default function Sidebar() {
         <ul className="space-y-2">
           <SidebarItem href="/admin" icon={<FiHome size={20} />} text="Dashboard" active={pathname === "/admin"} />
           <SidebarItem href="/admin/users" icon={<FiUsers size={20} />} text="Usuarios" active={pathname === "/admin/users"} />
-          <SidebarItem href="/admin/posts" icon={<FiFileText size={20} />} text="Publicaciones" active={pathname === "/admin/posts"} />
-          <SidebarItem href="/admin/settings" icon={<FiSettings size={20} />} text="Configuraciones" active={pathname === "/admin/settings"} />
+          <SidebarItem href="/admin/secret" icon={<FiClipboard size={20} />} text="Secretario" active={pathname === "/admin/secret"} />
+          <SidebarItem href="/admin/event" icon={<FiFileText size={20} />} text="Eventos" active={pathname === "/admin/event"} />
+          <SidebarItem href="/admin/upload" icon={<FiUserPlus size={20} />} text="Registro de Usuarios" active={pathname === "/admin/upload"} />
         </ul>
       </div>
 

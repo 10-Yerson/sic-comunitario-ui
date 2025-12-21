@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from '../../../utils/axios'
+import axios from '@/utils/axios'
 import { FiUsers, FiFileText, FiVideo, FiPlusCircle } from "react-icons/fi";
 
 export default function Dashboard() {
