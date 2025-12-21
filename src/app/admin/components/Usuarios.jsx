@@ -20,9 +20,6 @@ export default function Usuarios() {
     const [formData, setFormData] = useState({});
 
 
-    /* =============================
-       CERRAR MENU OPCIONES
-    ============================== */
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (optionsMenuRef.current && !optionsMenuRef.current.contains(e.target)) {
@@ -33,14 +30,12 @@ export default function Usuarios() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    /* =============================
-       LISTAR TODOS
-    ============================== */
     const fetchResidents = async () => {
         try {
             setLoading(true);
             const res = await axios.get('/api/resident/');
             setUserInfo(res.data);
+            console.log(res.data)
         } catch (err) {
             console.error(err);
             setError('Error al cargar residentes');
@@ -53,9 +48,6 @@ export default function Usuarios() {
         fetchResidents();
     }, []);
 
-    /* =============================
-       BUSCAR POR CÉDULA (API)
-    ============================== */
     const searchByCedula = async (cedula) => {
         if (!cedula) {
             fetchResidents();
@@ -73,19 +65,23 @@ export default function Usuarios() {
         }
     };
 
-    /* =============================
-       ABRIR MODAL (SIN BUSCAR POR ID)
-    ============================== */
-    const openModal = (user) => {
-        setSelectedUser(user);
-        setFormData(user);
-        setEditMode(false);
-        setModalOpen(true);
+    const openModal = async (userId) => {
+        try {
+            setLoading(true);
+            setModalOpen(true);
+
+            const res = await axios.get(`/api/resident/${userId}`);
+            setSelectedUser(res.data);
+
+        } catch (error) {
+            console.error(error);
+            alert('No se pudo cargar el perfil');
+            setModalOpen(false);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    /* =============================
-       ELIMINAR
-    ============================== */
     const handleDeleteUser = async () => {
         if (!selectedUser) return;
 
@@ -127,7 +123,6 @@ export default function Usuarios() {
     return (
         <div className="p-6 bg-white rounded-xl shadow-md">
 
-            {/* HEADER + BUSCADOR */}
             <div className="mb-6 flex flex-col md:flex-row md:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">
                     Residentes de la comunidad
@@ -146,13 +141,10 @@ export default function Usuarios() {
                 />
             </div>
 
-            {/* LOADING */}
             {loading && <p className="text-center text-gray-500">Cargando...</p>}
 
-            {/* ERROR */}
             {error && <p className="text-red-500">{error}</p>}
 
-            {/* TABLA */}
             {!loading && (
                 <table className="w-full border-separate border-spacing-y-3 text-sm">
                     <thead>
@@ -207,7 +199,7 @@ export default function Usuarios() {
 
                                 <td className="px-6 py-4 text-center">
                                     <button
-                                        onClick={() => openModal(user)}
+                                        onClick={() => openModal(user._id)}
                                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                                     >
                                         Ver perfil
@@ -219,47 +211,100 @@ export default function Usuarios() {
                 </table>
             )}
 
-            {/* MODAL (SIN CAMBIOS FUNCIONALES) */}
             {modalOpen && selectedUser && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-                    <div className="bg-white p-6 rounded-2xl shadow-xl w-96 relative">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl relative overflow-hidden">
+
+                        <div className="h-24 bg-gradient-to-r from-blue-500 to-indigo-600" />
 
                         <button
                             onClick={() => setModalOpen(false)}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-xl"
+                            className="absolute top-4 right-4 text-white/80 hover:text-red-400 text-xl"
                         >
                             ✖
                         </button>
 
-                        <div className="absolute top-3 left-3" ref={optionsMenuRef}>
-                            <button
-                                onClick={() => setOptionsMenuOpen(!optionsMenuOpen)}
-                                className="text-3xl"
-                            >
-                                ⋮
-                            </button>
-
-                            {optionsMenuOpen && (
-                                <div className="absolute mt-2 w-32 bg-white shadow rounded-lg border">
-                                    <button
-                                        onClick={handleDeleteUser}
-                                        className="w-full px-4 py-2 text-red-600 hover:bg-gray-100 text-left"
-                                    >
-                                        🗑 Eliminar
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col items-center">
+                        <div className="flex justify-center -mt-12">
                             <img
                                 src={selectedUser.profilePicture}
-                                className="w-24 h-24 rounded-full border-4 border-blue-500 object-cover"
+                                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
                             />
-                            <h2 className="text-xl font-bold mt-3">
+                        </div>
+
+                        <div className="text-center mt-2 px-6">
+                            <h2 className="text-xl font-bold text-gray-800">
                                 {selectedUser.name} {selectedUser.apellido}
                             </h2>
-                            <p className="text-gray-500">{selectedUser.email}</p>
+                            <p className="text-gray-500 text-sm">{selectedUser.email}</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 px-8 text-sm text-gray-700">
+
+                            <div className="flex gap-3">
+                                <span className="text-blue-500">🪪</span>
+                                <div>
+                                    <p className="text-gray-500">Cédula</p>
+                                    <p className="font-semibold">{selectedUser.cedula}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <span className="text-blue-500">📞</span>
+                                <div>
+                                    <p className="text-gray-500">Teléfono</p>
+                                    <p className="font-semibold">{selectedUser.telefono}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <span className="text-blue-500">🏠</span>
+                                <div>
+                                    <p className="text-gray-500">Lote</p>
+                                    <p className="font-semibold">{selectedUser.lote}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <span className="text-blue-500">⚧</span>
+                                <div>
+                                    <p className="text-gray-500">Género</p>
+                                    <p className="font-semibold">{selectedUser.genero}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <span className="text-blue-500">🎂</span>
+                                <div>
+                                    <p className="text-gray-500">Nacimiento</p>
+                                    <p className="font-semibold">
+                                        {selectedUser.fechaNacimiento?.slice(0, 10)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 md:col-span-2">
+                                <span className="text-blue-500">📍</span>
+                                <div>
+                                    <p className="text-gray-500">Dirección</p>
+                                    <p className="font-semibold">{selectedUser.direccion}</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div className="flex justify-between items-center px-8 py-4 mt-6 border-t">
+                            <button
+                                className="px-6 py-2 rounded-xl bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition"
+                            >
+                                ✏️ Editar
+                            </button>
+
+                            <button
+                                onClick={handleDeleteUser}
+                                className="px-6 py-2 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition"
+                            >
+                                🗑 Eliminar
+                            </button>
                         </div>
 
                     </div>

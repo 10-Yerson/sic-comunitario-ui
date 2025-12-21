@@ -1,69 +1,132 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from '@/utils/axios'
-import { FiUsers, FiFileText, FiVideo, FiPlusCircle } from "react-icons/fi";
+import axios from '@/utils/axios';
+import Link from 'next/link';
+import {
+  FiUsers,
+  FiUserCheck,
+  FiCalendar,
+  FiUpload,
+  FiPlusCircle
+} from 'react-icons/fi';
 
 export default function Dashboard() {
-
-  const [userCount, setUserCount] = useState(0);
+  const [stats, setStats] = useState({
+    encargados: 0,
+    comuneros: 0,
+    eventos: 0
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStats = async () => {
       try {
-        const response = await axios.get(`/api/user/`);
-        const count = Array.isArray(response.data) ? response.data.length : 0;
-        setUserCount(count);
+        const [usersRes, residentsRes, eventsRes] = await Promise.all([
+          axios.get('/api/user'),
+          axios.get('/api/resident'),
+          axios.get('/api/event')
+        ]);
+
+        setStats({
+          encargados: usersRes.data.length || 0,
+          comuneros: residentsRes.data.length || 0,
+          eventos: eventsRes.data.length || 0
+        });
       } catch (error) {
-        console.error('Error al obtener usuarios:', error);
-        setUserCount(0);
+        console.error('Error cargando estadísticas:', error);
       }
     };
-    fetchData();
+
+    fetchStats();
   }, []);
-  
 
   return (
-    <div className="p-8 bg-white min-h-screen text-gray-900 flex flex-col">
-      <header className="mb-8 text-center">
-        <h1 className="text-4xl font-extrabold text-gray-800">Panel de Administración</h1>
-        <p className="text-gray-600 mt-2">Monitorea y gestiona tu plataforma de manera eficiente.</p>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      {/* HEADER */}
+      <header className="mb-10 text-center">
+        <h1 className="text-4xl font-extrabold text-gray-800">
+          Panel de Administración
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Sistema Integral Comunitario (SIC)
+        </p>
       </header>
 
-      <main className="flex flex-col gap-10">
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <DashboardCard icon={<FiUsers size={36} />} title="Usuarios" value={userCount} color="bg-gray-100" />
-          <DashboardCard icon={<FiFileText size={36} />} title="Publicaciones" value="342" color="bg-gray-200" />
-          <DashboardCard icon={<FiVideo size={36} />} title="Videos" value="126" color="bg-gray-100" />
-        </section>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <StatCard
+          icon={<FiUsers size={32} />}
+          title="Encargados"
+          value={stats.encargados}
+          href="/admin/secret"
+        />
 
-        <section className="bg-gray-100 p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold text-gray-800 text-center">Acciones Rápidas</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            <ActionButton icon={<FiPlusCircle size={24} />} text="Agregar Usuario" color="bg-blue-600" />
-            <ActionButton icon={<FiPlusCircle size={24} />} text="Crear Publicación" color="bg-green-600" />
-            <ActionButton icon={<FiPlusCircle size={24} />} text="Subir Video" color="bg-purple-600" />
+        <StatCard
+          icon={<FiUserCheck size={32} />}
+          title="Habitantes"
+          value={stats.comuneros}
+          href="/admin/users"
+        />
+
+        <StatCard
+          icon={<FiCalendar size={32} />}
+          title="Eventos"
+          value={stats.eventos}
+          href="/admin/event"
+        />
+      </section>
+
+      <section className="bg-white p-6 rounded-xl shadow border">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          Acciones rápidas
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <QuickAction
+            icon={<FiUpload />}
+            text="Importar Habitantes (Excel)"
+            href="/admin/upload"
+            color="bg-[#31DCB7]"
+          />
+
+          <QuickAction
+            icon={<FiPlusCircle />}
+            text="Crear Evento Comunitario"
+            href="/admin/events/create"
+            color="bg-[#5060BC]"
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function StatCard({ icon, title, value, href }) {
+  return (
+    <Link href={href}>
+      <div className="cursor-pointer bg-white p-6 rounded-xl shadow border hover:shadow-lg transition">
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-gray-100 rounded-full text-gray-700">
+            {icon}
           </div>
-        </section>
-      </main>
-    </div>
+          <div>
+            <p className="text-sm text-gray-500">{title}</p>
+            <p className="text-3xl font-bold text-gray-800">{value}</p>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
 
-function DashboardCard({ icon, title, value, color }) {
+function QuickAction({ icon, text, href, color }) {
   return (
-    <div className={`p-6 rounded-lg shadow-md text-gray-900 ${color} flex flex-col items-center border border-gray-300 transition-transform transform hover:scale-105` }>
-      <div className="bg-gray-300 p-5 rounded-full text-gray-800 shadow-md mb-3">{icon}</div>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-3xl font-bold">{value}</p>
-    </div>
-  );
-}
-
-function ActionButton({ icon, text, color }) {
-  return (
-    <button className={`flex items-center justify-center gap-3 px-6 py-3 rounded-lg shadow-md text-white ${color} hover:bg-opacity-80 transition-all duration-300 w-full text-lg font-medium`}>      
-      {icon} {text}
-    </button>
+    <Link href={href}>
+      <div
+        className={`flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow cursor-pointer hover:opacity-90 ${color}`}
+      >
+        {icon}
+        <span className="font-medium">{text}</span>
+      </div>
+    </Link>
   );
 }
