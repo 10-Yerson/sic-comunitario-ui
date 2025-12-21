@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import axios from '@/utils/axios';
+import { FiCalendar, FiClock, FiMapPin, FiUsers } from 'react-icons/fi';
 
 export default function EventosComunity() {
   const [events, setEvents] = useState([]);
@@ -23,24 +24,39 @@ export default function EventosComunity() {
   }, []);
 
   if (loading) {
-    return <p className="text-center mt-10">Cargando eventos...</p>;
+    return (
+      <p className="text-center mt-20 text-gray-500 animate-pulse">
+        Cargando eventos...
+      </p>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">
-        Eventos de la Comunidad
-      </h1>
+    <div className="max-w-7xl mx-auto p-6">
+      {/* HEADER */}
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold text-gray-800">
+          Eventos de la Comunidad
+        </h1>
+        <p className="text-gray-500 mt-1">
+          Reuniones y actividades programadas
+        </p>
+      </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* GRID */}
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => (
           <div
             key={event._id}
-            className="bg-white rounded-xl shadow-md border overflow-hidden"
+            className="
+              bg-white rounded-2xl shadow-md overflow-hidden
+              hover:shadow-xl hover:-translate-y-1
+              transition-all duration-300
+            "
           >
-            {/* MEDIA (imagen o video) */}
+            {/* MEDIA */}
             {event.media && (
-              <div className="w-full h-56 bg-black">
+              <div className="relative h-56 bg-black">
                 {event.media.type === 'image' ? (
                   <img
                     src={event.media.url}
@@ -52,46 +68,69 @@ export default function EventosComunity() {
                     src={event.media.url}
                     controls
                     preload="metadata"
-                    className="w-full h-full object-contain rounded-lg"
+                    className="w-full h-full object-cover"
                     controlsList="nodownload noremoteplayback"
                     disablePictureInPicture
                   />
                 )}
+
+                {/* BADGE TIPO */}
+                <span
+                  className={`
+                    absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold
+                    ${event.type === 'reunion'
+                      ? 'bg-blue-500/90 text-white'
+                      : 'bg-emerald-500/90 text-white'}
+                  `}
+                >
+                  {event.type === 'reunion' ? 'Reunión' : 'Trabajo'}
+                </span>
               </div>
             )}
 
             {/* CONTENIDO */}
-            <div className="p-5">
-              <h2 className="text-xl font-semibold text-[#31DCB7]">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-gray-800 line-clamp-2">
                 {event.title}
               </h2>
 
-              <span className="inline-block mt-1 text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-700">
-                {event.type === 'reunion' ? 'Reunión' : 'Trabajo'}
-              </span>
-
-              <p className="mt-3 text-gray-600">
+              <p className="mt-3 text-gray-600 text-sm line-clamp-3">
                 {event.description}
               </p>
 
-              <div className="mt-4 text-sm text-gray-500 space-y-1">
-                <p>📅 {new Date(event.date).toLocaleDateString()}</p>
-                <p>⏰ {event.startTime}</p>
-                <p>📍 {event.location}</p>
+              {/* INFO */}
+              <div className="mt-5 space-y-2 text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  <FiCalendar />
+                  {new Date(event.date).toLocaleDateString()}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <FiClock />
+                  {event.startTime}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <FiMapPin />
+                  {event.location}
+                </div>
               </div>
 
               {/* ORGANIZADOR */}
-              <div className="flex items-center gap-3 mt-4 pt-4 border-t">
+              <div className="flex items-center gap-3 mt-6 pt-4 border-t">
                 <img
                   src={event.organizer.profilePicture}
                   alt="Organizador"
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div>
-                  <p className="text-sm font-medium">
+                  <p className="text-sm font-medium text-gray-800">
                     {event.organizer.name} {event.organizer.apellido}
                   </p>
-                  <p className="text-xs text-gray-500">Organizador</p>
+                  <div className="flex items-center gap-1 text-xs text-gray-500">
+                    <FiUsers size={12} />
+                    Organizador
+                  </div>
                 </div>
               </div>
             </div>

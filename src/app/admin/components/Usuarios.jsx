@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import axios from '@/utils/axios';
+import { FiEdit, FiTrash2 } from 'react-icons/fi';
 
 export default function Usuarios() {
     const [userInfo, setUserInfo] = useState([]);
@@ -291,22 +292,30 @@ export default function Usuarios() {
                             </div>
 
                         </div>
+                        <div className="flex justify-end items-center gap-4 px-8 py-4 mt-6 border-t bg-gray-50/60">
 
-                        <div className="flex justify-between items-center px-8 py-4 mt-6 border-t">
                             <button
-                                className="px-6 py-2 rounded-xl bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition"
-                            >
-                                ✏️ Editar
+                                title="Editar"
+                                className="group relative flex items-center justify-center w-11 h-11 rounded-full bg-yellow-500/90 text-white shadow-md hover:bg-yellow-500 hover:scale-105 transition-all duration-200">
+                                <FiEdit size={20} />
+
+                                <span className="absolute -top-9 scale-0 group-hover:scale-100 rounded-md bg-gray-900 text-white text-xs px-2 py-1 transition-transform">
+                                    Editar
+                                </span>
                             </button>
 
                             <button
                                 onClick={handleDeleteUser}
-                                className="px-6 py-2 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition"
-                            >
-                                🗑 Eliminar
-                            </button>
-                        </div>
+                                title="Eliminar"
+                                className="group relative flex items-center justify-center w-11 h-11 rounded-full bg-red-500/90 text-white shadow-md hover:bg-red-500 hover:scale-105 transition-all duration-200">
+                                <FiTrash2 size={20} />
 
+                                <span className="absolute -top-9 scale-0 group-hover:scale-100 rounded-md bg-gray-900 text-white text-xs px-2 py-1 transition-transform">
+                                    Eliminar
+                                </span>
+                            </button>
+
+                        </div>
                     </div>
                 </div>
             )}

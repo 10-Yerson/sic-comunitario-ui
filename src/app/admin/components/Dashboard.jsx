@@ -90,7 +90,7 @@ export default function Dashboard() {
 
           <QuickAction
             icon={<FiPlusCircle />}
-            text="Crear Evento Comunitario"
+            text="Crear usuario (Secretario / Colaborador)"
             href="/admin/events/create"
             color="bg-[#5060BC]"
           />
