@@ -1,4 +1,4 @@
-import UserPanel from "../components/Dasboard/siderbar/index";
+import UserPanel from "../components/siderbar";
 import ProtectedRoute from "@/protected/ProtectedRoute";
 
 export default function Layout({ children }) {

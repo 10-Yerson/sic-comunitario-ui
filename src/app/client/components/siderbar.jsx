@@ -55,8 +55,8 @@ export default function UserPanel() {
 
         <ul className="flex md:flex-col md:mt-2 text-black capitalize space-x-4 md:space-x-0">
           <NavItem href="/client" Icon={HiHome} label="Home" />
-          <NavItem href="/client/messages" Icon={RiMessage3Fill} label="Mensajes" />
-          <NavItem href="/client/search" Icon={RiSearchFill} label="Buscar" />
+          <NavItem href="/client/event" Icon={RiMessage3Fill} label="Evento" />
+          <NavItem href="/client/gestion" Icon={RiSearchFill} label="gestion" />
           <NavItem href="/client/videos" Icon={MdVideoLibrary} label="Videos" />
           <NavItem href="/client/notifications" Icon={IoNotifications} label="Notificaciones" />
           <NavItem href="/client/profile" Icon={FaUserCircle} label="Perfil" />

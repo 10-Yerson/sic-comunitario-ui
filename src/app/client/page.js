@@ -1,6 +1,6 @@
 'use client';
 
-import Welcome from './components/home/house';
+import Welcome from './components/house';
 import Layout from './layouts/Layout';
 
 export default function UserPage() {

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import axios from '@/utils/axios';
-import { FiCalendar, FiClock, FiMapPin, FiUsers } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiMapPin, FiUsers, FiMoreVertical, FiTrash2 } from 'react-icons/fi';
 
 export default function EventosComunity() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openMenu, setOpenMenu] = useState(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -22,6 +23,18 @@ export default function EventosComunity() {
 
     fetchEvents();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!confirm('¿Seguro que deseas eliminar este evento?')) return;
+
+    try {
+      await axios.delete(`/api/event/${id}`);
+      setEvents(events.filter(event => event._id !== id));
+    } catch (error) {
+      console.error('Error al eliminar evento:', error);
+      alert('No se pudo eliminar el evento');
+    }
+  };
 
   if (loading) {
     return (
@@ -115,22 +128,50 @@ export default function EventosComunity() {
                   {event.location}
                 </div>
               </div>
+              <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative overflow-hidden">
 
-              {/* ORGANIZADOR */}
-              <div className="flex items-center gap-3 mt-6 pt-4 border-t">
-                <img
-                  src={event.organizer.profilePicture}
-                  alt="Organizador"
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-800">
-                    {event.organizer.name} {event.organizer.apellido}
-                  </p>
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
-                    <FiUsers size={12} />
-                    Organizador
+                {/* ORGANIZADOR */}
+                <div className="flex items-center gap-3">
+                  <img
+                    src={event.organizer.profilePicture}
+                    alt="Organizador"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">
+                      {event.organizer.name} {event.organizer.apellido}
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <FiUsers size={12} />
+                      Organizador
+                    </div>
                   </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+
+                  <button
+                    onClick={() => handleDelete(event._id)}
+                    className={`
+        flex items-center gap-1 text-red-600 text-sm font-medium
+        transition-all duration-300 ease-out
+        ${openMenu === event._id
+                        ? 'opacity-100 translate-x-0'
+                        : 'opacity-0 -translate-x-4 pointer-events-none'}
+      `}
+                  >
+                    <FiTrash2 />
+                    Eliminar
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setOpenMenu(openMenu === event._id ? null : event._id)
+                    }
+                    className="p-2 rounded-full hover:bg-gray-100 transition"
+                  >
+                    <FiMoreVertical className="text-gray-500" />
+                  </button>
                 </div>
               </div>
             </div>
