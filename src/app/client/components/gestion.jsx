@@ -7,16 +7,20 @@ import {
   FiClock,
   FiMapPin,
   FiEdit,
-  FiTrash2,
+  FiUsers,
   FiVideo,
   FiImage
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import AttendanceModal from '../components/AttendanceModal';
 
 export default function GestionEventos() {
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [openAttendance, setOpenAttendance] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const fetchMyEvents = async () => {
     try {
@@ -34,16 +38,9 @@ export default function GestionEventos() {
     fetchMyEvents();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar este evento?')) return;
-
-    try {
-      await axios.delete(`/api/event/${id}`);
-      toast.success('Evento eliminado');
-      setEvents(events.filter(e => e._id !== id));
-    } catch {
-      toast.error('No se pudo eliminar');
-    }
+  const openAttendanceModal = (event) => {
+    setSelectedEvent(event);
+    setOpenAttendance(true);
   };
 
   if (loading) {
@@ -87,16 +84,9 @@ export default function GestionEventos() {
             {event.media && (
               <div className="relative h-48 bg-black">
                 {event.media.type === 'image' ? (
-                  <img
-                    src={event.media.url}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={event.media.url} className="w-full h-full object-cover" />
                 ) : (
-                  <video
-                    src={event.media.url}
-                    controls
-                    className="w-full h-full object-cover"
-                  />
+                  <video src={event.media.url} controls className="w-full h-full object-cover" />
                 )}
 
                 <span className="absolute top-3 left-3 px-3 py-1 text-xs rounded-full bg-black/70 text-white flex items-center gap-1">
@@ -109,7 +99,7 @@ export default function GestionEventos() {
             {/* CONTENT */}
             <div className="p-5">
               <div className="flex justify-between items-start">
-                <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                <h2 className="text-lg font-semibold text-gray-800">
                   {event.title}
                 </h2>
 
@@ -128,18 +118,15 @@ export default function GestionEventos() {
                 {event.description}
               </p>
 
-              {/* INFO */}
               <div className="mt-4 space-y-2 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <FiCalendar />
                   {new Date(event.date).toLocaleDateString()}
                 </div>
-
                 <div className="flex items-center gap-2">
                   <FiClock />
                   {event.startTime} - {event.endTime}
                 </div>
-
                 <div className="flex items-center gap-2">
                   <FiMapPin />
                   {event.location}
@@ -147,20 +134,16 @@ export default function GestionEventos() {
               </div>
 
               {/* ACTIONS */}
-              <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
-                <button
-                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                >
-                  <FiEdit />
-                  Editar
+              <div className="flex justify-end gap-4 mt-6 pt-4 border-t">
+                <button className="text-blue-600 flex items-center gap-1">
+                  <FiEdit /> Editar
                 </button>
 
                 <button
-                  onClick={() => handleDelete(event._id)}
-                  className="text-red-600 hover:text-red-800 flex items-center gap-1"
+                  onClick={() => openAttendanceModal(event)}
+                  className="text-emerald-600 flex items-center gap-1"
                 >
-                  <FiTrash2 />
-                  Eliminar
+                  <FiUsers /> Asistencia
                 </button>
               </div>
             </div>
@@ -168,20 +151,21 @@ export default function GestionEventos() {
         ))}
       </div>
 
-      {events.length === 0 && (
-        <p className="text-center text-gray-500 mt-20">
-          No has creado eventos aún
-        </p>
+      {openAttendance && selectedEvent && (
+        <AttendanceModal
+          event={selectedEvent}
+          onClose={() => setOpenAttendance(false)}
+        />
       )}
     </div>
   );
 }
 
-/* COMPONENTE STAT */
+/* STAT */
 function Stat({ label, value }) {
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm text-center">
-      <p className="text-2xl font-bold text-gray-800">{value}</p>
+      <p className="text-2xl font-bold">{value}</p>
       <p className="text-sm text-gray-500">{label}</p>
     </div>
   );
