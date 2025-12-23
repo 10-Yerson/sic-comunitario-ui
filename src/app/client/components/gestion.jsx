@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import axios from '@/utils/axios';
 import {
   FiCalendar,
+  FiTrash2,
+  FiMoreVertical,
   FiClock,
   FiMapPin,
   FiEdit,
@@ -22,12 +24,14 @@ export default function GestionEventos() {
 
   const [openAttendance, setOpenAttendance] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [openMenu, setOpenMenu] = useState(null);
 
   const fetchMyEvents = async () => {
     try {
       const res = await axios.get('/api/event/my');
       setEvents(res.data.events);
       setStats(res.data.stats);
+      console.log(res.data.events)
     } catch (err) {
       toast.error('Error al cargar eventos');
     } finally {
@@ -79,7 +83,6 @@ export default function GestionEventos() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">
           Mis eventos
@@ -89,7 +92,6 @@ export default function GestionEventos() {
         </p>
       </div>
 
-      {/* STATS */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           <Stat label="Total" value={stats.total} />
@@ -99,89 +101,155 @@ export default function GestionEventos() {
         </div>
       )}
 
-      {/* GRID */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {events.map(event => (
-          <div
-            key={event._id}
-            className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden"
-          >
-            {/* MEDIA */}
-            {event.media && (
-              <div className="relative h-48 bg-black">
-                {event.media.type === 'image' ? (
-                  <img src={event.media.url} className="w-full h-full object-cover" />
-                ) : (
-                  <video src={event.media.url} controls className="w-full h-full object-cover" />
-                )}
+      <div className="max-w-7xl mx-auto">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {events.map((event) => (
+            <div
+              key={event._id}
+              className="
+                    bg-white rounded-2xl shadow-md overflow-hidden
+                    hover:shadow-xl hover:-translate-y-1
+                    transition-all duration-300
+                  "
+            >
 
-                <span className="absolute top-3 left-3 px-3 py-1 text-xs rounded-full bg-black/70 text-white flex items-center gap-1">
-                  {event.media.type === 'image' ? <FiImage /> : <FiVideo />}
-                  {event.media.type}
-                </span>
-              </div>
-            )}
+              {event.media && (
+                <div className="relative h-56 bg-black overflow-hidden">
+                  {event.media.type === 'image' ? (
+                    <img
+                      src={event.media.url}
+                      alt={event.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <video
+                      src={event.media.url}
+                      controls
+                      preload="metadata"
+                      className="w-full h-full object-cover"
+                      controlsList="nodownload noremoteplayback"
+                      disablePictureInPicture
+                    />
+                  )}
 
-            {/* CONTENT */}
-            <div className="p-5">
-              <div className="flex justify-between items-start">
-                <h2 className="text-lg font-semibold text-gray-800">
+                  <span className="absolute top-3 left-3 px-3 py-1 text-xs rounded-full bg-black/60 text-white flex items-center gap-1 backdrop-blur-sm">
+                    {event.media.type === 'image' ? <FiImage /> : <FiVideo />}
+                    {event.media.type}
+                  </span>
+
+                  <span
+                    className={`
+        absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold
+        backdrop-blur-sm
+        ${event.type === 'reunion'
+                        ? 'bg-blue-500/70 text-white'
+                        : 'bg-emerald-500/70 text-white'}
+      `}
+                  >
+                    {event.type === 'reunion' ? 'Reunión' : 'Trabajo'}
+                  </span>
+                </div>
+              )}
+
+              <div className="p-6">
+                <h2 className="text-xl font-semibold text-gray-800 line-clamp-2">
                   {event.title}
                 </h2>
 
-                <span
-                  className={`text-xs px-2 py-1 rounded-full ${event.type === 'reunion'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-emerald-100 text-emerald-700'
-                    }`}
-                >
-                  {event.type}
-                </span>
-              </div>
+                <p className="mt-3 text-gray-600 text-sm line-clamp-3">
+                  {event.description}
+                </p>
 
-              <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                {event.description}
-              </p>
+                <div className="mt-5 space-y-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <FiCalendar />
+                    {new Date(event.date).toLocaleDateString()}
+                  </div>
 
-              <div className="mt-4 space-y-2 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <FiCalendar />
-                  {new Date(event.date).toLocaleDateString()}
+                  <div className="flex items-center gap-2">
+                    <FiClock />
+                    {event.startTime}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <FiMapPin />
+                    {event.location}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <FiClock />
-                  {event.startTime} - {event.endTime}
+                <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative overflow-hidden">
+
+                  {/* ORGANIZADOR */}
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={event.organizer.profilePicture}
+                      alt="Organizador"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">
+                        {event.organizer.name} {event.organizer.apellido}
+                      </p>
+                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                        <FiUsers size={12} />
+                        Organizador
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+
+                    <button
+                      className={`
+    flex items-center justify-center text-emerald-600
+    transition-all duration-300 ease-out
+    ${openMenu === event._id
+                          ? 'opacity-100 translate-x-0'
+                          : 'opacity-0 -translate-x-4 pointer-events-none'}
+  `}
+                    >
+                      <FiUsers size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => downloadPDF(event._id, event.title)}
+                      className={`
+    flex items-center justify-center text-red-600
+    transition-all duration-300 ease-out
+    ${openMenu === event._id
+                          ? 'opacity-100 translate-x-0'
+                          : 'opacity-0 -translate-x-4 pointer-events-none'}
+  `}
+                    >
+                      <FiFileText size={18} />
+                    </button>
+
+                    <button onClick={() => openAttendanceModal(event)}
+                      className={`
+    flex items-center justify-center text-blue-600
+    transition-all duration-300 ease-out
+    ${openMenu === event._id
+                          ? 'opacity-100 translate-x-0'
+                          : 'opacity-0 -translate-x-4 pointer-events-none'}
+  `}
+                    >
+                      <FiEdit size={18} />
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setOpenMenu(openMenu === event._id ? null : event._id)
+                      }
+                      className="p-2 rounded-full hover:bg-gray-100 transition"
+                    >
+                      <FiMoreVertical className="text-gray-500" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <FiMapPin />
-                  {event.location}
-                </div>
-              </div>
 
-              {/* ACTIONS */}
-              <div className="flex justify-end gap-4 mt-6 pt-4 border-t">
-
-                <button className="text-blue-600 flex items-center gap-1">
-                  <FiEdit /> Editar
-                </button>
-
-                <button
-                  onClick={() => openAttendanceModal(event)}
-                  className="text-emerald-600 flex items-center gap-1"
-                >
-                  <FiUsers /> Asistencia
-                </button>
-
-                <button
-                  onClick={() => downloadPDF(event._id, event.title)}
-                  className="text-red-600 flex items-center gap-1"
-                >
-                  <FiFileText /> Acta PDF
-                </button>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {openAttendance && selectedEvent && (
@@ -194,7 +262,7 @@ export default function GestionEventos() {
   );
 }
 
-/* STAT */
+
 function Stat({ label, value }) {
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm text-center">
