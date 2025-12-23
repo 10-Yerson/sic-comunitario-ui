@@ -9,7 +9,8 @@ import {
   FiEdit,
   FiUsers,
   FiVideo,
-  FiImage
+  FiImage,
+  FiFileText
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import AttendanceModal from '../components/AttendanceModal';
@@ -50,6 +51,31 @@ export default function GestionEventos() {
       </p>
     );
   }
+
+  const downloadPDF = async (eventId, title) => {
+    try {
+      const res = await axios.get(
+        `/api/report/event/${eventId}/pdf`,
+        { responseType: 'blob' }
+      );
+
+      const url = window.URL.createObjectURL(
+        new Blob([res.data], { type: 'application/pdf' })
+      );
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `acta-${title}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      toast.error('No se pudo descargar el acta');
+    }
+  };
+
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -104,11 +130,10 @@ export default function GestionEventos() {
                 </h2>
 
                 <span
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    event.type === 'reunion'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-emerald-100 text-emerald-700'
-                  }`}
+                  className={`text-xs px-2 py-1 rounded-full ${event.type === 'reunion'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-emerald-100 text-emerald-700'
+                    }`}
                 >
                   {event.type}
                 </span>
@@ -135,6 +160,7 @@ export default function GestionEventos() {
 
               {/* ACTIONS */}
               <div className="flex justify-end gap-4 mt-6 pt-4 border-t">
+
                 <button className="text-blue-600 flex items-center gap-1">
                   <FiEdit /> Editar
                 </button>
@@ -144,6 +170,13 @@ export default function GestionEventos() {
                   className="text-emerald-600 flex items-center gap-1"
                 >
                   <FiUsers /> Asistencia
+                </button>
+
+                <button
+                  onClick={() => downloadPDF(event._id, event.title)}
+                  className="text-red-600 flex items-center gap-1"
+                >
+                  <FiFileText /> Acta PDF
                 </button>
               </div>
             </div>
