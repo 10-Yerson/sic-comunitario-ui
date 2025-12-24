@@ -126,7 +126,7 @@ export default function Usuarios() {
 
             <div className="mb-6 flex flex-col md:flex-row md:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">
-                    Residentes de la comunidad
+                    Habitantes de la comunidad
                 </h2>
 
                 <input

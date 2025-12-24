@@ -27,10 +27,10 @@ export default function Sidebar() {
 
         <ul className="space-y-2">
           <SidebarItem href="/admin" icon={<FiHome size={20} />} text="Dashboard" active={pathname === "/admin"} />
-          <SidebarItem href="/admin/users" icon={<FiUsers size={20} />} text="Usuarios" active={pathname === "/admin/users"} />
-          <SidebarItem href="/admin/secret" icon={<FiClipboard size={20} />} text="Secretario" active={pathname === "/admin/secret"} />
-          <SidebarItem href="/admin/event" icon={<FiFileText size={20} />} text="Eventos" active={pathname === "/admin/event"} />
-          <SidebarItem href="/admin/upload" icon={<FiUserPlus size={20} />} text="Subir de Usuarios" active={pathname === "/admin/upload"} />
+          <SidebarItem href="/admin/users" icon={<FiUsers size={20} />} text="Habitantes" active={pathname === "/admin/users"} />
+          <SidebarItem href="/admin/secret" icon={<FiClipboard size={20} />} text="Equipo de Gestión" active={pathname === "/admin/secret"} />
+          <SidebarItem href="/admin/event" icon={<FiFileText size={20} />} text="Eventos Comunitarios" active={pathname === "/admin/event"} />
+          <SidebarItem href="/admin/upload" icon={<FiUserPlus size={20} />} text="Cargar Usuarios" active={pathname === "/admin/upload"} />
           <SidebarItem href="/admin/colaborador" icon={<FiPlusCircle size={20} />} text="Agregar Colaborador" active={pathname === "/admin/colaborador"} />
           <SidebarItem href="/admin/profile" icon={<FiUser size={20} />} text="Mi perfil" active={pathname === "/admin/profile"} />
         </ul>

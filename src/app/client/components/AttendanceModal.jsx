@@ -8,6 +8,12 @@ export default function AttendanceModal({ event, onClose }) {
   const [attendance, setAttendance] = useState({});
   const [saving, setSaving] = useState(false);
 
+  // Contar cuántos tienen status seleccionado
+  const selectedCount = residents.filter(r => attendance[r._id]?.status).length;
+  const asistenCount = residents.filter(r => attendance[r._id]?.status === 'asistio').length;
+  const faltoCount = residents.filter(r => attendance[r._id]?.status === 'falto').length;
+  const justificadoCount = residents.filter(r => attendance[r._id]?.status === 'justificado').length;
+
   useEffect(() => {
     axios.get('/api/resident')
       .then(res => setResidents(res.data))
@@ -35,15 +41,39 @@ export default function AttendanceModal({ event, onClose }) {
       }
     });
   };
+  
+  // ✅ Función para marcar a todos como asistentes
+  const markAllAsAttended = () => {
+    const newAttendance = {};
+    residents.forEach(r => {
+      newAttendance[r._id] = {
+        status: 'asistio',
+        justification: ''
+      };
+    });
+    setAttendance(newAttendance);
+  };
 
   const saveAttendance = async () => {
     setSaving(true);
 
-    const attendances = residents.map(r => ({
-      residentId: r._id,
-      status: attendance[r._id]?.status || 'no_asistio',
-      justification: attendance[r._id]?.justification || ''
-    }));
+    // ✅ SOLO enviar residentes que tienen un status seleccionado
+    const attendances = residents
+      .filter(r => attendance[r._id]?.status) // Solo los que tienen status
+      .map(r => ({
+        residentId: r._id,
+        status: attendance[r._id].status,
+        justification: attendance[r._id]?.justification || ''
+      }));
+    
+    // Validar que se haya seleccionado al menos uno
+    if (attendances.length === 0) {
+      alert('Debes seleccionar el estado de al menos un residente');
+      setSaving(false);
+      return;
+    }
+    
+    console.log('📤 Enviando asistencias:', attendances);
 
     try {
       await axios.post('/api/attendance/bulk', {
@@ -53,7 +83,8 @@ export default function AttendanceModal({ event, onClose }) {
 
       alert('Asistencia registrada correctamente');
       onClose();
-    } catch {
+    } catch (error) {
+      console.error('Error:', error);
       alert('Error al registrar asistencia');
     } finally {
       setSaving(false);
@@ -66,13 +97,32 @@ export default function AttendanceModal({ event, onClose }) {
 
         {/* HEADER */}
         <div className="flex justify-between items-center mb-5">
-          <h2 className="text-xl font-bold text-gray-800">
-            Asistencia · {event.title}
-          </h2>
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">
+              Asistencia · {event.title}
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {selectedCount} de {residents.length} registrados
+              {selectedCount > 0 && (
+                <span className="ml-2">
+                  (✅ {asistenCount} · ❌ {faltoCount} · 📋 {justificadoCount})
+                </span>
+              )}
+            </p>
+          </div>
           <button onClick={onClose} className="text-xl">✕</button>
         </div>
 
         {/* TABLE */}
+        <div className="mb-3 flex justify-end">
+          <button
+            onClick={markAllAsAttended}
+            className="px-4 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-sm font-medium"
+          >
+            ✅ Marcar todos como asistentes
+          </button>
+        </div>
+        
         <div className="overflow-auto max-h-[60vh]">
           <table className="w-full text-sm border">
             <thead className="bg-gray-100">
@@ -92,7 +142,7 @@ export default function AttendanceModal({ event, onClose }) {
                   </td>
                   <td className="p-2">{r.cedula}</td>
 
-                  {/* ESTADO */}
+                  {/* ESTADO - ✅ Valores corregidos para coincidir con el enum del modelo */}
                   <td className="p-2">
                     <select
                       className="border rounded px-2 py-1 w-full"
@@ -102,9 +152,9 @@ export default function AttendanceModal({ event, onClose }) {
                       }
                     >
                       <option value="">Seleccionar</option>
-                      <option value="asistio">Asistió</option>
-                      <option value="no_asistio">No asistió</option>
-                      <option value="justificado">Justificado</option>
+                      <option value="asistio">✅ Asistió</option>
+                      <option value="falto">❌ No asistió</option>
+                      <option value="justificado">📋 Justificado</option>
                     </select>
                   </td>
 
@@ -129,13 +179,24 @@ export default function AttendanceModal({ event, onClose }) {
         </div>
 
         {/* FOOTER */}
-        <div className="flex justify-end mt-5">
+        <div className="flex justify-end gap-3 mt-5">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300"
+          >
+            Cancelar
+          </button>
           <button
             onClick={saveAttendance}
-            disabled={saving}
-            className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+            disabled={saving || selectedCount === 0}
+            className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Guardando...' : 'Guardar asistencia'}
+            {saving 
+              ? 'Guardando...' 
+              : selectedCount > 0 
+                ? `Guardar ${selectedCount} asistencia${selectedCount > 1 ? 's' : ''}`
+                : 'Guardar asistencia'
+            }
           </button>
         </div>
       </div>

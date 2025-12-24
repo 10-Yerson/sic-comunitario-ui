@@ -130,7 +130,7 @@ export default function SecretarioUsuarios() {
             {/* HEADER + BUSCADOR */}
             <div className="mb-6 flex flex-col md:flex-row md:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">
-                    Secretario de la comunidad
+                    Equipo de Gestión
                 </h2>
 
                 <input

@@ -91,7 +91,7 @@ export default function Dashboard() {
           <QuickAction
             icon={<FiPlusCircle />}
             text="Crear usuario (Secretario / Colaborador)"
-            href="/admin/events/create"
+            href="/admin/colaborador"
             color="bg-[#5060BC]"
           />
         </div>
