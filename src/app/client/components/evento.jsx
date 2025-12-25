@@ -22,16 +22,25 @@ export default function CreateEvent() {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // estilos
+  // 🎨 NUEVOS ESTILOS
   const input =
-    'w-full px-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition';
+    'w-full px-3 py-1.5 text-sm rounded-xl border border-gray-300 bg-gray-50 ' +
+    'focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 ' +
+    'hover:border-gray-400 transition shadow-sm';
+
+  const textarea =
+    'w-full px-3 py-2 text-sm rounded-xl border border-gray-300 bg-gray-50 ' +
+    'focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 ' +
+    'hover:border-gray-400 transition shadow-sm min-h-[90px]';
+
   const section =
-    'bg-gray-50 border border-gray-200 rounded-2xl p-5 space-y-4';
+    'bg-white border border-gray-200 rounded-2xl p-5 space-y-4 shadow-sm';
 
   const button =
-    'flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition';
+    'flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-sm ' +
+    'bg-blue-600 text-white font-medium hover:bg-blue-700 transition shadow hover:shadow-md';
 
-  const label = 'text-sm font-semibold text-gray-700';
+  const label = 'text-xs font-semibold text-gray-600';
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -49,7 +58,6 @@ export default function CreateEvent() {
     if (!form.date) return 'Debes elegir una fecha';
     if (!form.startTime) return 'Debes indicar hora de inicio';
     if (!form.endTime) return 'Debes indicar hora de fin';
-
     if (form.startTime >= form.endTime)
       return 'La hora de fin debe ser mayor a la de inicio';
 
@@ -103,19 +111,19 @@ export default function CreateEvent() {
   };
 
   return (
-    <div className="w-full mx-auto">
-      <div className="bg-white rounded-3xl shadow-xl px-3 py-5 max-w-7xl mx-auto">
+    <div className="w-full mx-auto mt-4">
+      <div className="bg-white rounded-3xl shadow-xl px-4 py-6 max-w-6xl mx-auto">
 
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">
           Crear Evento
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-6">
 
-            <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-gray-800">
+            <div className="space-y-4">
+              <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wide">
                 Información general
               </h2>
 
@@ -130,7 +138,7 @@ export default function CreateEvent() {
               <textarea
                 name="description"
                 placeholder="Descripción *"
-                className={input}
+                className={textarea}
                 value={form.description}
                 onChange={handleChange}
               />
@@ -163,10 +171,10 @@ export default function CreateEvent() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
 
                 <div className="flex flex-col gap-1">
-                  <label className={label}>Inicio de la reunión *</label>
+                  <label className={label}>Inicio *</label>
                   <input
                     type="time"
                     name="startTime"
@@ -177,7 +185,7 @@ export default function CreateEvent() {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className={label}>Fin de la reunión *</label>
+                  <label className={label}>Fin *</label>
                   <input
                     type="time"
                     name="endTime"
@@ -190,15 +198,16 @@ export default function CreateEvent() {
               </div>
             </div>
 
-            {/* COLUMNA 2 */}
-            <div className="space-y-6">
+            <div className="space-y-4">
 
               {type === 'reunion' && (
                 <div className={section}>
-                  <h2 className="font-semibold text-lg">Agenda</h2>
+                  <h2 className="font-semibold text-sm text-gray-700">
+                    Agenda
+                  </h2>
 
                   {agenda.map((a, i) => (
-                    <div key={i} className="grid grid-cols-2 gap-3">
+                    <div key={i} className="grid grid-cols-2 gap-2">
                       <input
                         placeholder="Punto"
                         className={input}
@@ -235,11 +244,13 @@ export default function CreateEvent() {
               )}
 
               <div className={section}>
-                <h2 className="font-semibold text-lg">Imagen / Video</h2>
+                <h2 className="font-semibold text-sm text-gray-700">
+                  Imagen / Video
+                </h2>
 
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl p-6 cursor-pointer hover:bg-gray-100">
-                  <FiImage size={32} />
-                  <span className="text-sm text-gray-500 mt-2">
+                <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl p-5 cursor-pointer hover:bg-gray-50 transition">
+                  <FiImage size={28} className="text-gray-500" />
+                  <span className="text-xs text-gray-500 mt-1">
                     Subir archivo
                   </span>
 
@@ -252,11 +263,11 @@ export default function CreateEvent() {
                 </label>
 
                 {preview && (
-                  <div className="rounded-xl overflow-hidden">
+                  <div className="rounded-xl overflow-hidden shadow">
                     {media?.type.startsWith('video') ? (
-                      <video src={preview} controls className="w-full max-h-64 object-cover" />
+                      <video src={preview} controls className="w-full max-h-60 object-cover" />
                     ) : (
-                      <img src={preview} className="w-full max-h-64 object-cover" />
+                      <img src={preview} className="w-full max-h-60 object-cover" />
                     )}
                   </div>
                 )}
@@ -265,7 +276,7 @@ export default function CreateEvent() {
               <textarea
                 name="observations"
                 placeholder="Observaciones"
-                className={input}
+                className={textarea}
                 value={form.observations}
                 onChange={handleChange}
               />
