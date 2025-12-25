@@ -190,7 +190,7 @@ export default function GestionEventos() {
                 </div>
                 <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative overflow-hidden">
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 mt-3">
                     <img
                       src={event.organizer.profilePicture}
                       alt="Organizador"
@@ -208,54 +208,97 @@ export default function GestionEventos() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <button
-                      className={`
-    flex items-center justify-center text-emerald-600
-    transition-all duration-300 ease-out
-    ${openMenu === event._id
-                          ? 'opacity-100 translate-x-0'
-                          : 'opacity-0 -translate-x-4 pointer-events-none'}
-  `}
-                    >
-                      <FiUsers size={21} />
-                    </button>
+                    <div className="relative group">
+                      <button
+                        className={`
+        flex items-center justify-center text-emerald-600
+        hover:scale-110 transition-all duration-300
+        ${openMenu === event._id
+                            ? 'opacity-100 translate-x-0'
+                            : 'opacity-0 -translate-x-4 pointer-events-none'}
+      `}
+                      >
+                        <FiUsers size={21} />
+                      </button>
+
+                      <span className="
+      absolute -top-9 left-1/2 -translate-x-1/2 
+      px-3 py-1 text-[12px] font-medium rounded-md 
+      bg-black/85 text-white shadow-md
+      whitespace-nowrap
+      opacity-0 group-hover:opacity-100 transition
+      pointer-events-none
+    ">
+                        Ver asistentes
+                      </span>
+                    </div>
+
 
                     {openMenu === event._id && event.status === 'finalizado' && (
-                      <button
-                        onClick={() => downloadPDF(event._id, event.title)}
-                        className="
-      flex items-center justify-center text-red-600
-      transition-all duration-300 ease-out
-    "
-                      >
-                        <FiFileText size={21} />
-                      </button>
+                      <div className="relative group">
+                        <button
+                          onClick={() => downloadPDF(event._id, event.title)}
+                          className="flex items-center justify-center text-red-600 hover:scale-110 transition-all duration-300"
+                        >
+                          <FiFileText size={21} />
+                        </button>
+
+                        <span className="
+        absolute -top-9 left-1/2 -translate-x-1/2 
+        px-3 py-1 text-[12px] font-medium rounded-md 
+        bg-black/85 text-white shadow-md
+        whitespace-nowrap
+        opacity-0 group-hover:opacity-100 transition
+        pointer-events-none
+      ">
+                          Descargar acta
+                        </span>
+                      </div>
                     )}
 
 
                     {openMenu === event._id && (
-                      <button
-                        onClick={() => openAttendanceModal(event)}
-                        disabled={event.status === 'finalizado'}
-                        className={`
-        flex items-center justify-center
-        ${event.status === 'finalizado'
-                            ? 'text-gray-400 cursor-not-allowed'
-                            : 'text-blue-600'}
-      `}
-                      >
-                        <FiEdit size={21} />
-                      </button>
+                      <div className="relative group">
+                        <button
+                          onClick={() => openAttendanceModal(event)}
+                          disabled={event.status === 'finalizado'}
+                          className={`
+          flex items-center justify-center hover:scale-110 transition-all duration-300
+          ${event.status === 'finalizado'
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-blue-600'}
+        `}
+                        >
+                          <FiEdit size={21} />
+                        </button>
+
+                        <span className="
+        absolute -top-9 left-1/2 -translate-x-1/2 
+        px-3 py-1 text-[12px] font-medium rounded-md 
+        bg-black/85 text-white shadow-md
+        whitespace-nowrap
+        opacity-0 group-hover:opacity-100 transition
+        pointer-events-none
+      ">
+                          {event.status === 'finalizado'
+                            ? 'Evento finalizado'
+                            : 'Registrar asistencia'}
+                        </span>
+                      </div>
                     )}
 
-                    <button
-                      onClick={() =>
-                        setOpenMenu(openMenu === event._id ? null : event._id)
-                      }
-                      className="p-2 rounded-full hover:bg-gray-100 transition"
-                    >
-                      <FiMoreVertical className="text-gray-500" />
-                    </button>
+
+                    <div className="relative group">
+                      <button
+                        onClick={() =>
+                          setOpenMenu(openMenu === event._id ? null : event._id)
+                        }
+                        className="p-2 rounded-full hover:bg-gray-100 transition"
+                      >
+                        <FiMoreVertical className="text-gray-500" />
+                      </button>
+                    </div>
+
                   </div>
                 </div>
 
