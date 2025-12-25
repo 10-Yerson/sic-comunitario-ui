@@ -41,7 +41,7 @@ export default function AttendanceModal({ event, onClose }) {
       }
     });
   };
-  
+
   // ✅ Función para marcar a todos como asistentes
   const markAllAsAttended = () => {
     const newAttendance = {};
@@ -65,14 +65,14 @@ export default function AttendanceModal({ event, onClose }) {
         status: attendance[r._id].status,
         justification: attendance[r._id]?.justification || ''
       }));
-    
+
     // Validar que se haya seleccionado al menos uno
     if (attendances.length === 0) {
       alert('Debes seleccionar el estado de al menos un residente');
       setSaving(false);
       return;
     }
-    
+
     console.log('📤 Enviando asistencias:', attendances);
 
     try {

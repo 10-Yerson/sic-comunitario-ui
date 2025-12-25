@@ -1,17 +1,20 @@
 'use client'
 
 import React from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import axios from '@/utils/axios';
 
 import { HiHome } from "react-icons/hi";
-import { RiMessage3Fill, RiSearchFill } from "react-icons/ri";
-import { MdVideoLibrary } from "react-icons/md";
+import { RiMessage3Fill, RiSearchFill, RiCalendarEventFill} from "react-icons/ri";
+import { MdVideoLibrary, MdDashboard } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
 import { FaUserCircle } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
+import { FiLogOut } from "react-icons/fi";
 
 export default function UserPanel() {
 
+  const router = useRouter();
   const pathname = usePathname();
 
   const NavItem = ({ href, Icon, label }) => {
@@ -47,6 +50,15 @@ export default function UserPanel() {
     );
   };
 
+    const handleLogout = async () => {
+    try {
+      await axios.post('/api/auth/logout', {}, { withCredentials: true });
+      router.push('/');
+      console.log("Sesión cerrada correctamente");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  }
   return (
     <div className="bg-gray-100 dark:bg-gray-900 flex-1">
 
@@ -55,15 +67,16 @@ export default function UserPanel() {
 
         <ul className="flex md:flex-col md:mt-2 text-black capitalize space-x-4 md:space-x-0">
           <NavItem href="/client" Icon={HiHome} label="Home" />
-          <NavItem href="/client/event" Icon={RiMessage3Fill} label="Evento" />
-          <NavItem href="/client/gestion" Icon={RiSearchFill} label="gestion" />
-          <NavItem href="/client/videos" Icon={MdVideoLibrary} label="Videos" />
+          <NavItem href="/client/event" Icon={RiCalendarEventFill} label="Evento" />
+          <NavItem href="/client/gestion" Icon={MdDashboard} label="gestion" />
+          {/* <NavItem href="/client/videos" Icon={MdVideoLibrary} label="Videos" /> */}
           <NavItem href="/client/notifications" Icon={IoNotifications} label="Notificaciones" />
           <NavItem href="/client/profile" Icon={FaUserCircle} label="Perfil" />
         </ul>
 
         <div className="mt-auto flex items-center space-x-3 p-3 rounded-full">
-          <BsThreeDots className="h-7 w-7" />
+          <FiLogOut onClick={handleLogout}
+          className="h-7 w-7" />
         </div>
       </nav>
 

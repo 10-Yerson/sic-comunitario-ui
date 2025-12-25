@@ -41,6 +41,7 @@ export default function SecretarioUsuarios() {
             setLoading(true);
             const res = await axios.get('/api/user/');
             setUserInfo(res.data);
+            //console.log(res.data)
         } catch (err) {
             console.error(err);
             setError('Error al cargar residentes');
@@ -158,7 +159,7 @@ export default function SecretarioUsuarios() {
                     <thead>
                         <tr className="text-gray-500 uppercase text-xs">
                             <th className="px-6 py-3 text-left">Usuario</th>
-                            <th className="px-6 py-3">Lote</th>
+                            <th className="px-6 py-3">Genero</th>
                             <th className="px-6 py-3">Correo</th>
                             <th className="px-6 py-3 text-center">Estado</th>
                             <th className="px-6 py-3 text-center">Acciones</th>
@@ -190,13 +191,13 @@ export default function SecretarioUsuarios() {
                                             {user.name} {user.apellido}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            CC: {user.cedula}
+                                            CC: {user.profile.cedula}
                                         </p>
                                     </div>
                                 </td>
 
-                                <td className="px-6 py-4">{user.lote}</td>
-                                <td className="px-6 py-4">{user.email}</td>
+                                <td className="px-6 py-4 text-center">{user.profile.genero}</td>
+                                <td className="px-6 py-4 text-center">{user.email}</td>
 
                                 <td className="px-6 py-4 text-center">
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold
