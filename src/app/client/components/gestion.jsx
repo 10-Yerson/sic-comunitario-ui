@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import AttendanceModal from '../components/AttendanceModal';
+import ViewAttendanceModal from '../components/ViewAttendanceModal';
 
 export default function GestionEventos() {
   const [events, setEvents] = useState([]);
@@ -25,6 +26,9 @@ export default function GestionEventos() {
   const [openAttendance, setOpenAttendance] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openMenu, setOpenMenu] = useState(null);
+
+  const [isAttendanceViewerOpen, setIsAttendanceViewerOpen] = useState(false);
+  const [attendanceEventId, setAttendanceEventId] = useState(null);
 
   const fetchMyEvents = async () => {
     try {
@@ -47,6 +51,17 @@ export default function GestionEventos() {
     setSelectedEvent(event);
     setOpenAttendance(true);
   };
+
+  const openAttendanceViewer = (eventId) => {
+    setAttendanceEventId(eventId);
+    setIsAttendanceViewerOpen(true);
+  };
+
+  const closeAttendanceViewer = () => {
+    setIsAttendanceViewerOpen(false);
+    setAttendanceEventId(null);
+  };
+
 
   if (loading) {
     return (
@@ -208,20 +223,18 @@ export default function GestionEventos() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="relative group">
-                      <button
-                        className={`
+                    {openMenu === event._id && event.status === 'finalizado' && (
+                      <div className="relative group">
+                        <button onClick={() => openAttendanceViewer(event._id)}
+                          className="
         flex items-center justify-center text-emerald-600
         hover:scale-110 transition-all duration-300
-        ${openMenu === event._id
-                            ? 'opacity-100 translate-x-0'
-                            : 'opacity-0 -translate-x-4 pointer-events-none'}
-      `}
-                      >
-                        <FiUsers size={21} />
-                      </button>
+      "
+                        >
+                          <FiUsers size={21} />
+                        </button>
 
-                      <span className="
+                        <span className="
       absolute -top-9 left-1/2 -translate-x-1/2 
       px-3 py-1 text-[12px] font-medium rounded-md 
       bg-black/85 text-white shadow-md
@@ -229,10 +242,10 @@ export default function GestionEventos() {
       opacity-0 group-hover:opacity-100 transition
       pointer-events-none
     ">
-                        Ver asistentes
-                      </span>
-                    </div>
-
+                          Ver asistentes
+                        </span>
+                      </div>
+                    )}
 
                     {openMenu === event._id && event.status === 'finalizado' && (
                       <div className="relative group">
@@ -314,6 +327,13 @@ export default function GestionEventos() {
           onClose={() => setOpenAttendance(false)}
         />
       )}
+      {isAttendanceViewerOpen && attendanceEventId && (
+        <ViewAttendanceModal
+          eventId={attendanceEventId}
+          onClose={closeAttendanceViewer}
+        />
+      )}
+
     </div>
   );
 }
