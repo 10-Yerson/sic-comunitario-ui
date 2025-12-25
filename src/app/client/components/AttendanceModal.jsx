@@ -81,10 +81,15 @@ export default function AttendanceModal({ event, onClose }) {
         attendances
       });
 
-      alert('Asistencia registrada correctamente');
+      // 2️⃣ Cambiar estado del evento
+      await axios.patch(`/api/event/${event._id}/status`, {
+        status: 'finalizado'
+      });
+
+      alert('Asistencia registrada y evento finalizado');
       onClose();
     } catch (error) {
-      console.error('Error:', error);
+      console.error(error);
       alert('Error al registrar asistencia');
     } finally {
       setSaving(false);
@@ -122,7 +127,7 @@ export default function AttendanceModal({ event, onClose }) {
             ✅ Marcar todos como asistentes
           </button>
         </div>
-        
+
         <div className="overflow-auto max-h-[60vh]">
           <table className="w-full text-sm border">
             <thead className="bg-gray-100">
@@ -191,9 +196,9 @@ export default function AttendanceModal({ event, onClose }) {
             disabled={saving || selectedCount === 0}
             className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving 
-              ? 'Guardando...' 
-              : selectedCount > 0 
+            {saving
+              ? 'Guardando...'
+              : selectedCount > 0
                 ? `Guardar ${selectedCount} asistencia${selectedCount > 1 ? 's' : ''}`
                 : 'Guardar asistencia'
             }

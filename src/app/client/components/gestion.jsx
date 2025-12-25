@@ -171,14 +171,25 @@ export default function GestionEventos() {
                     {event.startTime}
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <FiMapPin />
-                    {event.location}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <FiMapPin />
+                      <span>{event.location}</span>
+                    </div>
+                    <span
+                      className={`
+      px-3 py-1 text-[12px] font-semibold rounded-full shadow-md
+      ${event.status === 'finalizado'
+                          ? 'bg-emerald-600/80 text-white'
+                          : 'bg-amber-500/80 text-white'}
+    `}
+                    >
+                      {event.status === 'finalizado' ? 'Finalizado' : 'Programado'}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative overflow-hidden">
 
-                  {/* ORGANIZADOR */}
                   <div className="flex items-center gap-3">
                     <img
                       src={event.organizer.profilePicture}
@@ -196,8 +207,7 @@ export default function GestionEventos() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-
+                  <div className="flex items-center gap-3">
                     <button
                       className={`
     flex items-center justify-center text-emerald-600
@@ -207,33 +217,36 @@ export default function GestionEventos() {
                           : 'opacity-0 -translate-x-4 pointer-events-none'}
   `}
                     >
-                      <FiUsers size={18} />
+                      <FiUsers size={21} />
                     </button>
 
-                    <button
-                      onClick={() => downloadPDF(event._id, event.title)}
-                      className={`
-    flex items-center justify-center text-red-600
-    transition-all duration-300 ease-out
-    ${openMenu === event._id
-                          ? 'opacity-100 translate-x-0'
-                          : 'opacity-0 -translate-x-4 pointer-events-none'}
-  `}
-                    >
-                      <FiFileText size={18} />
-                    </button>
+                    {openMenu === event._id && event.status === 'finalizado' && (
+                      <button
+                        onClick={() => downloadPDF(event._id, event.title)}
+                        className="
+      flex items-center justify-center text-red-600
+      transition-all duration-300 ease-out
+    "
+                      >
+                        <FiFileText size={21} />
+                      </button>
+                    )}
 
-                    <button onClick={() => openAttendanceModal(event)}
-                      className={`
-    flex items-center justify-center text-blue-600
-    transition-all duration-300 ease-out
-    ${openMenu === event._id
-                          ? 'opacity-100 translate-x-0'
-                          : 'opacity-0 -translate-x-4 pointer-events-none'}
-  `}
-                    >
-                      <FiEdit size={18} />
-                    </button>
+
+                    {openMenu === event._id && (
+                      <button
+                        onClick={() => openAttendanceModal(event)}
+                        disabled={event.status === 'finalizado'}
+                        className={`
+        flex items-center justify-center
+        ${event.status === 'finalizado'
+                            ? 'text-gray-400 cursor-not-allowed'
+                            : 'text-blue-600'}
+      `}
+                      >
+                        <FiEdit size={21} />
+                      </button>
+                    )}
 
                     <button
                       onClick={() =>
