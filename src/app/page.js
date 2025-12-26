@@ -1,4 +1,5 @@
 import AboutSection from "./components/AboutSection";
+import ComuneroConsulta from "./components/consultas";
 import Footer from "./components/Footer";
 import HeroSection from "./components/HeroSection";
 import MeetingsSection from "./components/MeetingsSection";
@@ -11,6 +12,7 @@ export default function Home() {
       <HeroSection />
       <AboutSection />
       <MeetingsSection/>
+      <ComuneroConsulta/>
       <Footer />
     </>
   );
