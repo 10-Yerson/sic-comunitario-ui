@@ -1,8 +1,7 @@
 import AboutSection from "./components/AboutSection";
-import CallToAction from "./components/CallToAction";
-import Features from "./components/Features";
 import Footer from "./components/Footer";
 import HeroSection from "./components/HeroSection";
+import MeetingsSection from "./components/MeetingsSection";
 import NavbarPublic from "./components/NavbarPublic";
 
 export default function Home() {
@@ -11,8 +10,7 @@ export default function Home() {
       <NavbarPublic />
       <HeroSection />
       <AboutSection />
-      <Features />
-      <CallToAction />
+      <MeetingsSection/>
       <Footer />
     </>
   );
