@@ -71,7 +71,7 @@ export default function UserPanel() {
           <NavItem href="/client/gestion" Icon={MdDashboard} label="gestion" />
           {/* <NavItem href="/client/videos" Icon={MdVideoLibrary} label="Videos" /> */}
           <NavItem href="/client/notifications" Icon={IoNotifications} label="Notificaciones" />
-          <NavItem href="/client/profile" Icon={FaUserCircle} label="Perfil" />
+          <NavItem href="/client/perfil" Icon={FaUserCircle} label="Perfil" />
         </ul>
 
         <div className="mt-auto flex items-center space-x-3 p-3 rounded-full">

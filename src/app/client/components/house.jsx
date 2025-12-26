@@ -114,7 +114,7 @@ export default function Welcome() {
           <ActionButton
             icon={<FiCalendar size={22} />}
             label="Mis Eventos"
-            href="/client/event"
+            href="/client/gestion"
           />
 
           <ActionButton
