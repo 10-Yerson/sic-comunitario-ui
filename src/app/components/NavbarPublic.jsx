@@ -62,7 +62,7 @@ export default function NavbarPublic() {
 
         <div className="hidden lg:flex items-center gap-3">
            <a
-            href="/consultar"
+            href="#historial"
             className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 group"
           >
             <Search className="w-4 h-4 group-hover:scale-110 transition-transform" />
@@ -115,7 +115,7 @@ export default function NavbarPublic() {
 
           <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
              <a
-              href="/consultar"
+              href="#historial"
               className="flex items-center justify-center gap-2 w-full px-4 py-3 text-center rounded-lg text-green-700 font-medium hover:bg-green-50 transition-all duration-200 border border-green-200"
               onClick={() => setMobileMenuOpen(false)}
             >

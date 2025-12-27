@@ -52,7 +52,7 @@ export default function ComuneroConsulta() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 pt-24 pb-12 px-4 relative overflow-hidden">
+        <div id="historial" className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 pt-24 pb-12 px-4 relative overflow-hidden">
             
             {/* Decoraciones de fondo */}
             <div className="absolute top-0 left-0 w-96 h-96 bg-blue-200 rounded-full blur-3xl opacity-20"></div>

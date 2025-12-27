@@ -2,7 +2,7 @@ import { Users, Calendar, Shield, TrendingUp } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-800 via-green-700 to-teal-600 text-white overflow-hidden">
+    <section  id="inicio" className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-800 via-green-700 to-teal-600 text-white overflow-hidden">
       
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>

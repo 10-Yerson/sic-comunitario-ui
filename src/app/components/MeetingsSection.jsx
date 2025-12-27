@@ -81,7 +81,7 @@ export default function MeetingsSection() {
 
   return (
     <>
-      <section className="py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden" id="reuniones">
+      <section id="reuniones" className="py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden">
         
         {/* Decoración de fondo */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-30"></div>
@@ -172,7 +172,7 @@ export default function MeetingsSection() {
                         </div>
                       </div>
 
-                      <button 
+                      <button id="trabajos"
                         onClick={() => openModal(meeting)}
                         className="block w-full bg-blue-50 text-blue-700 py-2.5 rounded-lg font-semibold hover:bg-blue-100 transition-colors text-center"
                       >
@@ -190,7 +190,7 @@ export default function MeetingsSection() {
             <div className="mb-16">
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center shadow-lg">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center shadow-lg">
                     <Users className="w-6 h-6 text-white" />
                   </div>
                   Trabajos Comunitarios
@@ -204,11 +204,8 @@ export default function MeetingsSection() {
                 {trabajosProximos.map((work) => (
                   <div
                     key={work.id}
-                    className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-orange-200 group hover:-translate-y-2 relative"
+                    className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-emerald-200 group hover:-translate-y-2 relative"
                   >
-                    {/* Banda decorativa superior */}
-                    <div className="h-2 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500"></div>
-                    
                     {/* Imagen con overlay */}
                     {work.imagen && (
                       <div className="h-56 overflow-hidden relative">
@@ -223,72 +220,49 @@ export default function MeetingsSection() {
                         <div className="absolute top-4 right-4">
                           <span className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${
                             work.estado === 'en_curso'
-                              ? 'bg-yellow-400 text-yellow-900'
-                              : 'bg-green-400 text-green-900'
+                              ? 'bg-emerald-400 text-emerald-900'
+                              : 'bg-teal-400 text-teal-900'
                           }`}>
                             {work.estado === 'en_curso' ? '⚡ En Curso' : '📅 Programado'}
                           </span>
                         </div>
-
-                        {/* Título sobre la imagen */}
-                        <div className="absolute bottom-4 left-4 right-4">
-                          <h4 className="text-xl font-bold text-white drop-shadow-lg">
-                            {work.titulo}
-                          </h4>
-                        </div>
                       </div>
                     )}
                     
-                    <div className="p-6 bg-gradient-to-br from-orange-50 to-amber-50">
-                      <p className="text-sm text-gray-700 mb-4 leading-relaxed">
+                    <div className="p-6">
+                      <h4 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">
+                        {work.titulo}
+                      </h4>
+
+                      <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-2">
                         {work.descripcion}
                       </p>
 
-                      <div className="space-y-3 mb-5">
-                        <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm p-3 rounded-lg">
-                          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-400 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Calendar className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Fecha</p>
-                            <p className="text-sm font-bold text-gray-900">{work.fecha}</p>
-                          </div>
+                      <div className="space-y-2 mb-5">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Calendar className="w-4 h-4 text-emerald-500" />
+                          <span className="font-medium">{work.fecha}</span>
                         </div>
                         
-                        <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm p-3 rounded-lg">
-                          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-400 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Clock className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Horario</p>
-                            <p className="text-sm font-bold text-gray-900">{work.horaInicio} - {work.horaFin}</p>
-                          </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Clock className="w-4 h-4 text-emerald-500" />
+                          <span>{work.horaInicio} - {work.horaFin}</span>
                         </div>
                         
-                        <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm p-3 rounded-lg">
-                          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-400 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <MapPin className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Lugar</p>
-                            <p className="text-sm font-bold text-gray-900 line-clamp-1">{work.lugar}</p>
-                          </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <MapPin className="w-4 h-4 text-emerald-500" />
+                          <span className="line-clamp-1">{work.lugar}</span>
                         </div>
 
-                        <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm p-3 rounded-lg">
-                          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-400 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Users className="w-5 h-5 text-white" />
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 font-medium">Organiza</p>
-                            <p className="text-sm font-bold text-gray-900">{work.organizador}</p>
-                          </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Users className="w-4 h-4 text-emerald-500" />
+                          <span>Organiza: {work.organizador}</span>
                         </div>
                       </div>
 
                       <button 
                         onClick={() => openModal(work)}
-                        className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-3 rounded-xl font-bold hover:from-orange-600 hover:to-amber-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
+                        className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
                       >
                         Ver detalles completos
                         <ArrowRight className="w-5 h-5" />
@@ -337,7 +311,7 @@ export default function MeetingsSection() {
                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                               evento.tipo === 'reunion' 
                                 ? 'bg-blue-100 text-blue-700' 
-                                : 'bg-orange-100 text-orange-700'
+                                : 'bg-emerald-100 text-emerald-700'
                             }`}>
                               {evento.tipo === 'reunion' ? 'Reunión' : 'Trabajo'}
                             </span>
@@ -384,7 +358,7 @@ export default function MeetingsSection() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                   selectedEvent.tipo === 'reunion' 
                     ? 'bg-blue-100' 
-                    : 'bg-gradient-to-br from-orange-400 to-amber-400'
+                    : 'bg-gradient-to-br from-emerald-400 to-teal-400'
                 }`}>
                   {selectedEvent.tipo === 'reunion' ? (
                     <Calendar className="w-6 h-6 text-blue-600" />
@@ -395,7 +369,7 @@ export default function MeetingsSection() {
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">{selectedEvent.titulo}</h2>
                   <span className={`text-sm font-medium ${
-                    selectedEvent.tipo === 'reunion' ? 'text-blue-600' : 'text-orange-600'
+                    selectedEvent.tipo === 'reunion' ? 'text-blue-600' : 'text-emerald-600'
                   }`}>
                     {selectedEvent.tipo === 'reunion' ? 'Reunión' : 'Trabajo Comunitario'}
                   </span>
