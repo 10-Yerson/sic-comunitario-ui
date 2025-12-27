@@ -32,6 +32,7 @@ export default function Sidebar() {
           <SidebarItem href="/admin/event" icon={<FiFileText size={20} />} text="Eventos Comunitarios" active={pathname === "/admin/event"} />
           <SidebarItem href="/admin/upload" icon={<FiUserPlus size={20} />} text="Cargar Usuarios" active={pathname === "/admin/upload"} />
           <SidebarItem href="/admin/colaborador" icon={<FiPlusCircle size={20} />} text="Agregar Colaborador" active={pathname === "/admin/colaborador"} />
+          <SidebarItem href="/admin/admins" icon={<FiUser size={20} />} text="Administradores" active={pathname === "/admin/admins"} />
           <SidebarItem href="/admin/profile" icon={<FiUser size={20} />} text="Mi perfil" active={pathname === "/admin/profile"} />
         </ul>
       </div>
