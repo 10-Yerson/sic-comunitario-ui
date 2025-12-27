@@ -58,9 +58,6 @@ export default function CreateEvent() {
     if (!form.date) return 'Debes elegir una fecha';
     if (!form.startTime) return 'Debes indicar hora de inicio';
     if (!form.endTime) return 'Debes indicar hora de fin';
-    if (form.startTime >= form.endTime)
-      return 'La hora de fin debe ser mayor a la de inicio';
-
     return null;
   };
 
@@ -68,7 +65,7 @@ export default function CreateEvent() {
     e.preventDefault();
 
     const error = validate();
-    if (error) return toast.error(error);
+    if (error) return toast.info(error);
 
     setLoading(true);
 
