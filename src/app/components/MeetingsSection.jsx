@@ -18,8 +18,8 @@ export default function MeetingsSection() {
   const fetchEventos = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/event/public/');
-      setEventos(data.eventos || []);
+      const { data } = await axios.get('/api/event/comunity');
+      setEventos(data || []);
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Error al cargar eventos');
     } finally {
@@ -30,7 +30,7 @@ export default function MeetingsSection() {
   const fetchEventDetails = async (eventId) => {
     try {
       setLoadingDetails(true);
-      const { data } = await axios.get(`/api/event/public/${eventId}`);
+      const { data } = await axios.get(`/api/event/comunity/${eventId}`);
       setEventDetails(data);
     } catch (err) {
       console.error('Error al cargar detalles:', err);
@@ -41,7 +41,7 @@ export default function MeetingsSection() {
 
   const openModal = (event) => {
     setSelectedEvent(event);
-    fetchEventDetails(event.id);
+    fetchEventDetails(event._id);
   };
 
   const closeModal = () => {
@@ -50,9 +50,9 @@ export default function MeetingsSection() {
   };
 
   // Filtrar eventos por tipo y estado
-  const reunionesProximas = eventos.filter(e => e.tipo === 'reunion' && (e.estado === 'programado' || e.estado === 'en_curso'));
-  const trabajosProximos = eventos.filter(e => e.tipo === 'trabajo' && (e.estado === 'programado' || e.estado === 'en_curso'));
-  const eventosFinalizados = eventos.filter(e => e.estado === 'finalizado');
+  const reunionesProximas = eventos.filter(e => e.type === 'reunion' && (e.status === 'programado' || e.status === 'en_curso'));
+  const trabajosProximos = eventos.filter(e => e.type === 'trabajo' && (e.status === 'programado' || e.status === 'en_curso'));
+  const eventosFinalizados = eventos.filter(e => e.status === 'finalizado');
 
   if (loading) {
     return (
@@ -99,7 +99,7 @@ export default function MeetingsSection() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Mantén tu comunidad <span className="text-blue-600">organizada</span>
             </h2>
-            
+
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Administra reuniones, eventos comunitarios y consulta el historial completo de decisiones
             </p>
@@ -123,56 +123,54 @@ export default function MeetingsSection() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {reunionesProximas.map((meeting) => (
                   <div
-                    key={meeting.id}
+                    key={meeting._id}
                     className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group hover:-translate-y-1"
                   >
-                    {/* Imagen */}
-                    {meeting.imagen && (
+                    {meeting.media && (
                       <div className="h-48 overflow-hidden relative">
-                        <img 
-                          src={meeting.imagen} 
+                        <img
+                          src={meeting.media.url}
                           alt={meeting.titulo}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                       </div>
                     )}
-                    
+
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
-                        <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          meeting.estado === 'en_curso' 
-                            ? 'bg-green-100 text-green-700' 
+                        <div className={`px-3 py-1 rounded-full text-xs font-semibold ${meeting.estado === 'en_curso'
+                            ? 'bg-green-100 text-green-700'
                             : 'bg-purple-100 text-purple-700'
-                        }`}>
+                          }`}>
                           {meeting.estado === 'en_curso' ? 'En Curso' : 'Programado'}
                         </div>
                       </div>
 
                       <h4 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
-                        {meeting.titulo}
+                        {meeting.title}
                       </h4>
 
                       <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                        {meeting.descripcion}
+                        {meeting.description}
                       </p>
 
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Calendar className="w-4 h-4 text-blue-500" />
-                          <span>{meeting.fecha}</span>
+                          <span>{meeting.date}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Clock className="w-4 h-4 text-blue-500" />
-                          <span>{meeting.horaInicio} - {meeting.horaFin}</span>
+                          <span>{meeting.startTime} - {meeting.endTime}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin className="w-4 h-4 text-blue-500" />
-                          <span className="line-clamp-1">{meeting.lugar}</span>
+                          <span className="line-clamp-1">{meeting.location}</span>
                         </div>
                       </div>
 
-                      <button id="trabajos"
+                      <button
                         onClick={() => openModal(meeting)}
                         className="block w-full bg-blue-50 text-blue-700 py-2.5 rounded-lg font-semibold hover:bg-blue-100 transition-colors text-center"
                       >
@@ -203,64 +201,63 @@ export default function MeetingsSection() {
               <div className="grid md:grid-cols-2 gap-6">
                 {trabajosProximos.map((work) => (
                   <div
-                    key={work.id}
+                    key={work._id}
                     className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-emerald-200 group hover:-translate-y-2 relative"
                   >
                     {/* Imagen con overlay */}
-                    {work.imagen && (
+                    {work.media?.url && (
                       <div className="h-56 overflow-hidden relative">
-                        <img 
-                          src={work.imagen} 
-                          alt={work.titulo}
+                        <img
+                          src={work.media.url}
+                          alt={work.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                        
+
                         {/* Badge flotante */}
                         <div className="absolute top-4 right-4">
-                          <span className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${
-                            work.estado === 'en_curso'
+                          <span className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${work.status === 'en_curso'
                               ? 'bg-emerald-400 text-emerald-900'
                               : 'bg-teal-400 text-teal-900'
-                          }`}>
-                            {work.estado === 'en_curso' ? '⚡ En Curso' : '📅 Programado'}
+                            }`}>
+                            {work.status === 'en_curso' ? '⚡ En Curso' : '📅 Programado'}
                           </span>
                         </div>
                       </div>
                     )}
-                    
+
                     <div className="p-6">
                       <h4 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">
-                        {work.titulo}
+                        {work.title}
                       </h4>
 
                       <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-2">
-                        {work.descripcion}
+                        {work.description}
                       </p>
 
                       <div className="space-y-2 mb-5">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Calendar className="w-4 h-4 text-emerald-500" />
-                          <span className="font-medium">{work.fecha}</span>
+                          <span className="font-medium">{new Date(work.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                         </div>
-                        
+
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Clock className="w-4 h-4 text-emerald-500" />
-                          <span>{work.horaInicio} - {work.horaFin}</span>
+                          <span>{work.startTime} - {work.endTime}</span>
                         </div>
-                        
+
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin className="w-4 h-4 text-emerald-500" />
-                          <span className="line-clamp-1">{work.lugar}</span>
+                          <span className="line-clamp-1">{work.location}</span>
                         </div>
 
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Users className="w-4 h-4 text-emerald-500" />
-                          <span>Organiza: {work.organizador}</span>
+                          <span>Organiza: {work.organizer.name} {work.organizer.apellido}</span>
                         </div>
                       </div>
 
-                      <button 
+                      <button
                         onClick={() => openModal(work)}
                         className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-xl font-semibold hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
                       >
@@ -300,26 +297,25 @@ export default function MeetingsSection() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {eventosFinalizados.map((evento) => (
-                        <tr key={evento.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4">
+                        <tr key={evento._id} className="hover:bg-gray-50 transition-colors">
+                          <td  key={evento._id} className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                              <span className="font-medium text-gray-900 line-clamp-1">{evento.titulo}</span>
+                              <span className="font-medium text-gray-900 line-clamp-1">{evento.title}</span>
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              evento.tipo === 'reunion' 
-                                ? 'bg-blue-100 text-blue-700' 
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${evento.type === 'reunion'
+                                ? 'bg-blue-100 text-blue-700'
                                 : 'bg-emerald-100 text-emerald-700'
-                            }`}>
-                              {evento.tipo === 'reunion' ? 'Reunión' : 'Trabajo'}
+                              }`}>
+                              {evento.type === 'reunion' ? 'Reunión' : 'Trabajo'}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-gray-600">{evento.fecha}</td>
-                          <td className="px-6 py-4 text-gray-600">{evento.organizador}</td>
+                          <td className="px-6 py-4 text-gray-600">{new Date(evento.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</td>
+                          <td className="px-6 py-4 text-gray-600">{evento.organizer.name} {evento.organizer.apellido}</td>
                           <td className="px-6 py-4">
-                            <button 
+                            <button
                               onClick={() => openModal(evento)}
                               className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium text-sm group"
                             >
@@ -355,27 +351,25 @@ export default function MeetingsSection() {
             {/* Header del Modal */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10 rounded-t-3xl">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                  selectedEvent.tipo === 'reunion' 
-                    ? 'bg-blue-100' 
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedEvent.type === 'reunion'
+                    ? 'bg-blue-100'
                     : 'bg-gradient-to-br from-emerald-400 to-teal-400'
-                }`}>
-                  {selectedEvent.tipo === 'reunion' ? (
+                  }`}>
+                  {selectedEvent.type === 'reunion' ? (
                     <Calendar className="w-6 h-6 text-blue-600" />
                   ) : (
                     <Users className="w-6 h-6 text-white" />
                   )}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedEvent.titulo}</h2>
-                  <span className={`text-sm font-medium ${
-                    selectedEvent.tipo === 'reunion' ? 'text-blue-600' : 'text-emerald-600'
-                  }`}>
-                    {selectedEvent.tipo === 'reunion' ? 'Reunión' : 'Trabajo Comunitario'}
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedEvent.title}</h2>
+                  <span className={`text-sm font-medium ${selectedEvent.type === 'reunion' ? 'text-blue-600' : 'text-emerald-600'
+                    }`}>
+                    {selectedEvent.type === 'reunion' ? 'Reunión' : 'Trabajo Comunitario'}
                   </span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={closeModal}
                 className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
               >
@@ -390,13 +384,21 @@ export default function MeetingsSection() {
             ) : eventDetails ? (
               <div className="p-6">
                 {/* Imagen Principal */}
-                {selectedEvent.imagen && (
+                {selectedEvent.media?.url && (
                   <div className="mb-6 rounded-2xl overflow-hidden">
-                    <img 
-                      src={selectedEvent.imagen} 
-                      alt={selectedEvent.titulo}
-                      className="w-full h-64 object-cover"
-                    />
+                    {selectedEvent.media.type === 'video' ? (
+                      <video
+                        src={selectedEvent.media.url}
+                        controls
+                        className="w-full h-64 object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={selectedEvent.media.url}
+                        alt={selectedEvent.title}
+                        className="w-full h-64 object-cover"
+                      />
+                    )}
                   </div>
                 )}
 
@@ -407,7 +409,7 @@ export default function MeetingsSection() {
                       <Calendar className="w-5 h-5 text-blue-600" />
                       <span className="font-semibold text-gray-700">Fecha</span>
                     </div>
-                    <p className="text-gray-900 font-medium">{eventDetails.evento.fecha}</p>
+                    <p className="text-gray-900 font-medium">{new Date(eventDetails.event.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
 
                   <div className="bg-gray-50 rounded-xl p-4">
@@ -415,7 +417,7 @@ export default function MeetingsSection() {
                       <Clock className="w-5 h-5 text-blue-600" />
                       <span className="font-semibold text-gray-700">Horario</span>
                     </div>
-                    <p className="text-gray-900 font-medium">{eventDetails.evento.horaInicio} - {eventDetails.evento.horaFin}</p>
+                    <p className="text-gray-900 font-medium">{eventDetails.event.startTime} - {eventDetails.event.endTime}</p>
                   </div>
 
                   <div className="bg-gray-50 rounded-xl p-4">
@@ -423,7 +425,7 @@ export default function MeetingsSection() {
                       <MapPin className="w-5 h-5 text-blue-600" />
                       <span className="font-semibold text-gray-700">Lugar</span>
                     </div>
-                    <p className="text-gray-900 font-medium">{eventDetails.evento.lugar}</p>
+                    <p className="text-gray-900 font-medium">{eventDetails.event.location}</p>
                   </div>
 
                   <div className="bg-gray-50 rounded-xl p-4">
@@ -431,13 +433,12 @@ export default function MeetingsSection() {
                       <Tag className="w-5 h-5 text-blue-600" />
                       <span className="font-semibold text-gray-700">Estado</span>
                     </div>
-                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                      eventDetails.evento.estado === 'programado' ? 'bg-purple-100 text-purple-700' :
-                      eventDetails.evento.estado === 'en_curso' ? 'bg-green-100 text-green-700' :
-                      'bg-gray-200 text-gray-700'
-                    }`}>
-                      {eventDetails.evento.estado === 'programado' ? 'Programado' :
-                       eventDetails.evento.estado === 'en_curso' ? 'En Curso' : 'Finalizado'}
+                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${eventDetails.event.status === 'programado' ? 'bg-purple-100 text-purple-700' :
+                        eventDetails.event.status === 'en_curso' ? 'bg-green-100 text-green-700' :
+                          'bg-gray-200 text-gray-700'
+                      }`}>
+                      {eventDetails.event.status === 'programado' ? 'Programado' :
+                        eventDetails.event.status === 'en_curso' ? 'En Curso' : 'Finalizado'}
                     </span>
                   </div>
                 </div>
@@ -449,32 +450,32 @@ export default function MeetingsSection() {
                     Descripción
                   </h3>
                   <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl">
-                    {eventDetails.evento.descripcion}
+                    {eventDetails.event.description}
                   </p>
                 </div>
 
                 {/* Observaciones */}
-                {eventDetails.evento.observaciones && (
+                {eventDetails.event.observations && (
                   <div className="mb-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                       <AlertCircle className="w-5 h-5 text-amber-600" />
                       Observaciones
                     </h3>
                     <p className="text-gray-700 leading-relaxed bg-amber-50 p-4 rounded-xl border border-amber-200">
-                      {eventDetails.evento.observaciones}
+                      {eventDetails.event.observations}
                     </p>
                   </div>
                 )}
 
                 {/* Agenda (solo para reuniones) */}
-                {eventDetails.evento.agenda && eventDetails.evento.agenda.length > 0 && (
+                {eventDetails.event.agenda && eventDetails.event.agenda.length > 0 && eventDetails.event.agenda[0].punto && (
                   <div className="mb-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                       <FileCheck className="w-5 h-5 text-blue-600" />
                       Agenda
                     </h3>
                     <div className="space-y-3">
-                      {eventDetails.evento.agenda.map((item, index) => (
+                      {eventDetails.event.agenda.map((item, index) => (
                         <div key={item._id} className="bg-blue-50 p-4 rounded-xl border border-blue-200">
                           <div className="flex items-start gap-3">
                             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
@@ -492,14 +493,14 @@ export default function MeetingsSection() {
                 )}
 
                 {/* Decisiones (solo si hay) */}
-                {eventDetails.evento.decisions && eventDetails.evento.decisions.length > 0 && (
+                {eventDetails.event.decisions && eventDetails.event.decisions.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-600" />
                       Decisiones Tomadas
                     </h3>
                     <div className="space-y-2">
-                      {eventDetails.evento.decisions.map((decision, index) => (
+                      {eventDetails.event.decisions.map((decision, index) => (
                         <div key={index} className="bg-green-50 p-3 rounded-lg border border-green-200">
                           <p className="text-gray-700">{decision}</p>
                         </div>
@@ -508,29 +509,36 @@ export default function MeetingsSection() {
                   </div>
                 )}
 
-                {/* Participación */}
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Participación</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                {/* Estadísticas de Asistencia */}
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200 mb-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Estadísticas de Asistencia</h3>
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600">{eventDetails.participacion.totalRegistrados}</div>
-                      <div className="text-sm text-gray-600">Registrados</div>
+                      <div className="text-3xl font-bold text-green-600">{eventDetails.stats.totalAsistentes}</div>
+                      <div className="text-sm text-gray-600">Asistentes</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-bold text-green-600">{eventDetails.participacion.totalParticipantes}</div>
-                      <div className="text-sm text-gray-600">Participantes</div>
+                      <div className="text-3xl font-bold text-red-600">{eventDetails.stats.totalFaltas}</div>
+                      <div className="text-sm text-gray-600">Faltas</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-amber-600">{eventDetails.stats.totalJustificados}</div>
+                      <div className="text-sm text-gray-600">Justificados</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Organizador */}
-                <div className="mt-6 flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
+                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+                  <img
+                    src={eventDetails.event.organizer.profilePicture}
+                    alt={eventDetails.event.organizer.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-blue-500"
+                  />
                   <div>
                     <p className="text-sm text-gray-600">Organizado por</p>
-                    <p className="font-semibold text-gray-900">{eventDetails.evento.organizador}</p>
+                    <p className="font-semibold text-gray-900">{eventDetails.event.organizer.name} {eventDetails.event.organizer.apellido}</p>
+                    <p className="text-xs text-gray-500">{eventDetails.event.organizer.email}</p>
                   </div>
                 </div>
               </div>
