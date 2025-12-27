@@ -71,13 +71,12 @@ export default function UserPanel() {
   return (
     <div className="bg-gray-100 dark:bg-gray-900 flex-1">
 
-      <nav className="w-full hidden md:flex md:w-40 md:flex-col md:items-center justify-around bg-white py-4 fixed md:top-0 md:left-0 md:h-screen">
+      <nav className="w-full hidden md:flex md:w-40 md:flex-col md:items-center justify-around bg-white py-5 fixed md:top-0 md:left-0 md:h-screen">
 
         <ul className="flex md:flex-col md:mt-2 text-black capitalize space-x-4 md:space-x-0">
-          <NavItem href="/client" Icon={HiHome} label="Home" />
-          <NavItem href="/client/event" Icon={RiCalendarEventFill} label="Evento" />
-          <NavItem href="/client/gestion" Icon={MdDashboard} label="gestion" />
-          {/* <NavItem href="/client/notifications" Icon={IoNotifications} label="Notificaciones" /> */}
+          <NavItem href="/client" Icon={HiHome} label="Inicio" />
+          <NavItem href="/client/event" Icon={RiCalendarEventFill} label="Crear Evento" />
+          <NavItem href="/client/gestion" Icon={MdDashboard} label="gestion Evento" />
           <NavItem href="/client/perfil" Icon={FaUserCircle} label="Perfil" />
         </ul>
 
