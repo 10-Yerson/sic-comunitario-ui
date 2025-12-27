@@ -6,7 +6,7 @@ export default function Layout({ children }) {
     <ProtectedRoute allowedRoles={['user']}>
       <div className="flex">
         <UserPanel />
-        <div className="w-full md:ml-40 ml-0">{children}</div>
+        <div className="w-full md:ml-40 ml-0 pb-20 md:pb-0">{children}</div>
       </div>
     </ProtectedRoute>
   );
