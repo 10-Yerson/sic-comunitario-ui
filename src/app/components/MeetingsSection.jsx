@@ -82,20 +82,20 @@ export default function MeetingsSection() {
   return (
     <>
       <section id="reuniones" className="py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden">
-        
+
         {/* Decoración de fondo */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-30"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-100 rounded-full blur-3xl opacity-30"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          
+
           {/* Encabezado */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-6 font-medium text-sm">
               <Calendar className="w-4 h-4" />
               Gestión de Reuniones
             </div>
-            
+
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Mantén tu comunidad <span className="text-blue-600">organizada</span>
             </h2>
@@ -126,22 +126,41 @@ export default function MeetingsSection() {
                     key={meeting._id}
                     className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group hover:-translate-y-1"
                   >
-                    {meeting.media && (
-                      <div className="h-48 overflow-hidden relative">
-                        <img
-                          src={meeting.media.url}
-                          alt={meeting.titulo}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                      </div>
-                    )}
-
+                    <div className="h-48 overflow-hidden relative">
+                      {meeting.media?.url ? (
+                        meeting.media.type === 'video' ? (
+                          <>
+                            <video
+                              src={meeting.media.url}
+                              className="w-full h-full object-cover"
+                              controls
+                              preload="metadata"
+                              controlsList="nodownload noremoteplayback"
+                              disablePictureInPicture
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <img
+                              src={meeting.media.url}
+                              alt={meeting.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+                          </>
+                        )
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-lg text-center px-4">
+                          📁 Este evento no cuenta con archivos multimedia
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className={`px-3 py-1 rounded-full text-xs font-semibold ${meeting.estado === 'en_curso'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-purple-100 text-purple-700'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-purple-100 text-purple-700'
                           }`}>
                           {meeting.estado === 'en_curso' ? 'En Curso' : 'Programado'}
                         </div>
@@ -217,8 +236,8 @@ export default function MeetingsSection() {
                         {/* Badge flotante */}
                         <div className="absolute top-4 right-4">
                           <span className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${work.status === 'en_curso'
-                              ? 'bg-emerald-400 text-emerald-900'
-                              : 'bg-teal-400 text-teal-900'
+                            ? 'bg-emerald-400 text-emerald-900'
+                            : 'bg-teal-400 text-teal-900'
                             }`}>
                             {work.status === 'en_curso' ? '⚡ En Curso' : '📅 Programado'}
                           </span>
@@ -298,7 +317,7 @@ export default function MeetingsSection() {
                     <tbody className="divide-y divide-gray-100">
                       {eventosFinalizados.map((evento) => (
                         <tr key={evento._id} className="hover:bg-gray-50 transition-colors">
-                          <td  key={evento._id} className="px-6 py-4">
+                          <td key={evento._id} className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                               <span className="font-medium text-gray-900 line-clamp-1">{evento.title}</span>
@@ -306,8 +325,8 @@ export default function MeetingsSection() {
                           </td>
                           <td className="px-6 py-4">
                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${evento.type === 'reunion'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'bg-emerald-100 text-emerald-700'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-emerald-100 text-emerald-700'
                               }`}>
                               {evento.type === 'reunion' ? 'Reunión' : 'Trabajo'}
                             </span>
@@ -352,8 +371,8 @@ export default function MeetingsSection() {
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10 rounded-t-3xl">
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedEvent.type === 'reunion'
-                    ? 'bg-blue-100'
-                    : 'bg-gradient-to-br from-emerald-400 to-teal-400'
+                  ? 'bg-blue-100'
+                  : 'bg-gradient-to-br from-emerald-400 to-teal-400'
                   }`}>
                   {selectedEvent.type === 'reunion' ? (
                     <Calendar className="w-6 h-6 text-blue-600" />
@@ -434,8 +453,8 @@ export default function MeetingsSection() {
                       <span className="font-semibold text-gray-700">Estado</span>
                     </div>
                     <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${eventDetails.event.status === 'programado' ? 'bg-purple-100 text-purple-700' :
-                        eventDetails.event.status === 'en_curso' ? 'bg-green-100 text-green-700' :
-                          'bg-gray-200 text-gray-700'
+                      eventDetails.event.status === 'en_curso' ? 'bg-green-100 text-green-700' :
+                        'bg-gray-200 text-gray-700'
                       }`}>
                       {eventDetails.event.status === 'programado' ? 'Programado' :
                         eventDetails.event.status === 'en_curso' ? 'En Curso' : 'Finalizado'}
