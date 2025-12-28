@@ -218,7 +218,6 @@ export default function GestionEventos() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative overflow-hidden">
-
                   <div className="flex items-center gap-3 mt-3">
                     <img
                       src={event.organizer.profilePicture}
@@ -301,37 +300,30 @@ export default function GestionEventos() {
                       </div>
                     )}
 
-
-                    {openMenu === event._id && (
+                    {openMenu === event._id && event.status !== 'finalizado' && (
                       <div className="relative group">
                         <button
                           onClick={() => openAttendanceModal(event)}
-                          disabled={event.status === 'finalizado'}
-                          className={`
-          flex items-center justify-center hover:scale-110 transition-all duration-300
-          ${event.status === 'finalizado'
-                              ? 'text-gray-400 cursor-not-allowed'
-                              : 'text-blue-600'}
-        `}
+                          className="
+                            flex items-center justify-center text-blue-600
+                            hover:scale-110 transition-all duration-300
+                          "
                         >
                           <FiEdit size={21} />
                         </button>
 
                         <span className="
-        absolute -top-9 left-1/2 -translate-x-1/2 
-        px-3 py-1 text-[12px] font-medium rounded-md 
-        bg-black/85 text-white shadow-md
-        whitespace-nowrap
-        opacity-0 group-hover:opacity-100 transition
-        pointer-events-none
-      ">
-                          {event.status === 'finalizado'
-                            ? 'Evento finalizado'
-                            : 'Registrar asistencia'}
+                          absolute -top-9 left-1/2 -translate-x-1/2 
+                          px-3 py-1 text-[12px] font-medium rounded-md 
+                          bg-black/85 text-white shadow-md
+                          whitespace-nowrap
+                          opacity-0 group-hover:opacity-100 transition
+                          pointer-events-none
+                        ">
+                          Registrar asistencia
                         </span>
                       </div>
                     )}
-
 
                     <div className="relative group">
                       <button
@@ -343,10 +335,8 @@ export default function GestionEventos() {
                         <FiMoreVertical className="text-gray-500" />
                       </button>
                     </div>
-
                   </div>
                 </div>
-
               </div>
             </div>
           ))}
@@ -376,7 +366,6 @@ export default function GestionEventos() {
     </div>
   );
 }
-
 
 function Stat({ label, value }) {
   return (
