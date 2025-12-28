@@ -132,7 +132,7 @@ export default function MeetingsSection() {
                           <>
                             <video
                               src={meeting.media.url}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                               controls
                               preload="metadata"
                               controlsList="nodownload noremoteplayback"
@@ -159,8 +159,8 @@ export default function MeetingsSection() {
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className={`px-3 py-1 rounded-full text-xs font-semibold ${meeting.estado === 'en_curso'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-purple-100 text-purple-700'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-purple-100 text-purple-700'
                           }`}>
                           {meeting.estado === 'en_curso' ? 'En Curso' : 'Programado'}
                         </div>

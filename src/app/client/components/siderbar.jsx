@@ -3,6 +3,8 @@
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import axios from '@/utils/axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { HiHome } from "react-icons/hi";
 import { RiCalendarEventFill, RiLogoutCircleRLine } from "react-icons/ri";
@@ -10,9 +12,7 @@ import { MdDashboard } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 
-
 export default function UserPanel() {
-
   const router = useRouter();
   const pathname = usePathname();
 
@@ -20,82 +20,144 @@ export default function UserPanel() {
     const isActive = pathname === href;
 
     return (
-      <li className="mt-3 p-2 rounded-lg">
+      <li className="mb-2">
         <a
           href={href}
-          className={`relative flex flex-col items-center pb-1 transition-all duration-300 
-          ${isActive ? "border-b-2 border-black" : "hover:text-blue-600 dark:hover:text-blue-300"}`}
+          className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group
+            ${isActive 
+              ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg" 
+              : "text-gray-600 hover:bg-gray-100 hover:text-green-600"
+            }`}
         >
-          <Icon className="h-5 w-5" />
-          <span className="text-xs mt-2 tracking-wide">{label}</span>
+          <Icon className={`h-6 w-6 transition-transform duration-300 ${isActive ? "" : "group-hover:scale-110"}`} />
+          <span className="font-medium text-sm">{label}</span>
         </a>
       </li>
     );
   };
 
- const NavItems = ({ href, Icon, onClick }) => {
-  const isActive = pathname === href;
+  const NavItems = ({ href, Icon, onClick }) => {
+    const isActive = pathname === href;
 
-  return (
-    <li className="p-2 text-black">
-      {onClick ? (
-        <button
-          onClick={onClick}
-          className={`relative flex flex-col items-center pb-3`}
-        >
-          <Icon className="h-5 w-5 text-black" />
-        </button>
-      ) : (
-        <a
-          href={href}
-          className={`relative flex flex-col items-center pb-3 
-          ${isActive ? "border-b-2 border-black" : ""}`}
-        >
-          <Icon className="h-5 w-5 text-black" />
-        </a>
-      )}
-    </li>
-  );
-};
+    return (
+      <li className="p-2 text-black">
+        {onClick ? (
+          <button
+            onClick={onClick}
+            className="relative flex flex-col items-center pb-3"
+          >
+            <Icon className="h-6 w-6 text-black" />
+          </button>
+        ) : (
+          <a
+            href={href}
+            className={`relative flex flex-col items-center pb-3 
+            ${isActive ? "border-b-2 border-black" : ""}`}
+          >
+            <Icon className="h-6 w-6 text-black" />
+          </a>
+        )}
+      </li>
+    );
+  };
 
-
-    const handleLogout = async () => {
+  const handleLogout = async () => {
     try {
       await axios.post('/api/auth/logout', {}, { withCredentials: true });
-      router.push('/');
-      console.log("Sesión cerrada correctamente");
+      toast.success('¡Sesión cerrada exitosamente!', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
+      toast.error('Error al cerrar sesión', {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
-  }
+  };
+
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 flex-1">
+    <>
+      <div className="bg-gray-100 dark:bg-gray-900 flex-1">
+        {/* Menu Desktop */}
+        <nav className="w-full hidden md:flex md:w-64 md:flex-col bg-white fixed md:top-0 md:left-0 md:h-screen shadow-xl border-r border-gray-200 z-50">
+          
+          {/* Logo Section */}
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-xl">S</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">SIC</h1>
+                <p className="text-xs text-gray-500">Sistema Integral</p>
+              </div>
+            </div>
+          </div>
 
-      <nav className="w-full hidden md:flex md:w-40 md:flex-col md:items-center justify-around bg-white py-5 fixed md:top-0 md:left-0 md:h-screen">
+          {/* Navigation Items */}
+          <div className="flex-1 px-4 py-6 overflow-y-auto">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 px-4">
+              Menú Principal
+            </p>
+            <ul className="space-y-1">
+              <NavItem href="/client" Icon={HiHome} label="Inicio" />
+              <NavItem href="/client/event" Icon={RiCalendarEventFill} label="Crear Evento" />
+              <NavItem href="/client/gestion" Icon={MdDashboard} label="Gestión Evento" />
+              <NavItem href="/client/perfil" Icon={FaUserCircle} label="Perfil" />
+            </ul>
+          </div>
 
-        <ul className="flex md:flex-col md:mt-2 text-black capitalize space-x-4 md:space-x-0">
-          <NavItem href="/client" Icon={HiHome} label="Inicio" />
-          <NavItem href="/client/event" Icon={RiCalendarEventFill} label="Crear Evento" />
-          <NavItem href="/client/gestion" Icon={MdDashboard} label="gestion Evento" />
-          <NavItem href="/client/perfil" Icon={FaUserCircle} label="Perfil" />
-        </ul>
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-200">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-4 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300 group"
+            >
+              <FiLogOut className="h-6 w-6 group-hover:scale-110 transition-transform" />
+              <span className="font-medium text-sm">Cerrar Sesión</span>
+            </button>
+          </div>
+        </nav>
 
-        <div className="mt-auto flex items-center space-x-3 p-3 rounded-full">
-          <FiLogOut onClick={handleLogout}
-          className="h-7 w-7" />
-        </div>
-      </nav>
+        {/* Menu Mobile */}
+        <nav className="w-full flex justify-around p-3 fixed bottom-0 md:hidden z-50 bg-white shadow-lg border-t border-gray-200">
+          <ul className="flex justify-around w-full">
+            <NavItems href="/client/event" Icon={RiCalendarEventFill} />
+            <NavItems href="/client/gestion" Icon={MdDashboard} />
+            <NavItems href="/client" Icon={HiHome} />
+            <NavItems href="/client/perfil" Icon={FaUserCircle} />
+            <NavItems Icon={RiLogoutCircleRLine} onClick={handleLogout} />
+          </ul>
+        </nav>
+      </div>
 
-      <nav className="w-full flex justify-around p-3 fixed bottom-0 md:hidden z-50 bg-white">
-        <ul className="flex justify-around w-full capitalize">
-          <NavItems href="/client/event" Icon={RiCalendarEventFill} />
-          <NavItems href="/client/gestion" Icon={MdDashboard} />
-          <NavItems href="/client" Icon={HiHome} />
-          <NavItems href="/client/perfil" Icon={FaUserCircle} />
-          <NavItems Icon={RiLogoutCircleRLine} onClick={handleLogout} />
-        </ul>
-      </nav>
-
-    </div>
+      {/* Toast Container con diseño personalizado */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        style={{ zIndex: 9999 }}
+        toastStyle={{
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        }}
+      />
+    </>
   );
 }
