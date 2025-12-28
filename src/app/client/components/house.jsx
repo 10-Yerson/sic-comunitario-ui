@@ -118,12 +118,6 @@ export default function Welcome() {
           />
 
           <ActionButton
-            icon={<FiUsers size={22} />}
-            label="Residentes"
-            href="/client/residents"
-          />
-
-          <ActionButton
             icon={<FiFolder size={22} />}
             label="Historial"
             href="/client/history"

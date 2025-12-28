@@ -12,11 +12,13 @@ import {
   FiUsers,
   FiVideo,
   FiImage,
-  FiFileText
+  FiFileText,
+  FiClipboard
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import AttendanceModal from '../components/AttendanceModal';
 import ViewAttendanceModal from '../components/ViewAttendanceModal';
+import DecisionsModal from '../components/Desiciones';
 
 export default function GestionEventos() {
   const [events, setEvents] = useState([]);
@@ -30,12 +32,15 @@ export default function GestionEventos() {
   const [isAttendanceViewerOpen, setIsAttendanceViewerOpen] = useState(false);
   const [attendanceEventId, setAttendanceEventId] = useState(null);
 
+  // 👇 NUEVO: Estado para el modal de decisiones
+  const [isDecisionsModalOpen, setIsDecisionsModalOpen] = useState(false);
+  const [decisionsEvent, setDecisionsEvent] = useState(null);
+
   const fetchMyEvents = async () => {
     try {
       const res = await axios.get('/api/event/my');
       setEvents(res.data.events);
       setStats(res.data.stats);
-      console.log(res.data.events)
     } catch (err) {
       toast.error('Error al cargar eventos');
     } finally {
@@ -62,6 +67,15 @@ export default function GestionEventos() {
     setAttendanceEventId(null);
   };
 
+  const openDecisionsModal = (event) => {
+    setDecisionsEvent(event);
+    setIsDecisionsModalOpen(true);
+  };
+
+  const closeDecisionsModal = () => {
+    setIsDecisionsModalOpen(false);
+    setDecisionsEvent(null);
+  };
 
   if (loading) {
     return (
@@ -247,14 +261,32 @@ export default function GestionEventos() {
                       </div>
                     )}
 
-                    {openMenu === event._id && event.status === 'finalizado' && (
-                      <div className="relative group">
-                        <button
-                          onClick={() => downloadPDF(event._id, event.title)}
-                          className="flex items-center justify-center text-red-600 hover:scale-110 transition-all duration-300"
-                        >
-                          <FiFileText size={21} />
-                        </button>
+                    {openMenu === event._id &&
+                      event.status === 'finalizado' &&
+                      event.type === 'reunion' && (
+                        <div className="relative group">
+                          <button
+                            onClick={() => openDecisionsModal(event)}
+                            className="flex items-center justify-center text-purple-600 hover:scale-110 transition-all duration-300"
+                          >
+                            <FiClipboard size={21} />
+                          </button>
+
+                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 text-[12px] font-medium rounded-md bg-black/85 text-white shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                            Gestionar decisiones
+                          </span>
+                        </div>
+                      )}
+
+                    {openMenu === event._id &&
+                      event.status === 'finalizado' && (
+                        <div className="relative group">
+                          <button
+                            onClick={() => downloadPDF(event._id, event.title)}
+                            className="flex items-center justify-center text-red-600 hover:scale-110 transition-all duration-300"
+                          >
+                            <FiFileText size={21} />
+                          </button>
 
                         <span className="
         absolute -top-9 left-1/2 -translate-x-1/2 
@@ -327,6 +359,7 @@ export default function GestionEventos() {
           onClose={() => setOpenAttendance(false)}
         />
       )}
+
       {isAttendanceViewerOpen && attendanceEventId && (
         <ViewAttendanceModal
           eventId={attendanceEventId}
@@ -334,6 +367,12 @@ export default function GestionEventos() {
         />
       )}
 
+      {isDecisionsModalOpen && decisionsEvent && (
+        <DecisionsModal
+          event={decisionsEvent}
+          onClose={closeDecisionsModal}
+        />
+      )}
     </div>
   );
 }

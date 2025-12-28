@@ -16,7 +16,6 @@ export default function AdminInfo() {
       setLoading(true);
       const { data } = await axios.get('/api/admin');
       setAdmins(data);
-      console.error(data);
     } catch (error) {
       console.error(error);
       toast.error('Error al cargar administradores');
