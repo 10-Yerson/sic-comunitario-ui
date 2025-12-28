@@ -155,12 +155,12 @@ export default function MeetingsSection() {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className={`px-3 py-1 rounded-full text-xs font-semibold ${meeting.estado === 'en_curso'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-purple-100 text-purple-700'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-purple-100 text-purple-700'
                           }`}>
                           {meeting.estado === 'en_curso' ? 'En Curso' : 'Programado'}
                         </div>
@@ -518,10 +518,17 @@ export default function MeetingsSection() {
                       <CheckCircle className="w-5 h-5 text-green-600" />
                       Decisiones Tomadas
                     </h3>
-                    <div className="space-y-2">
-                      {eventDetails.event.decisions.map((decision, index) => (
-                        <div key={index} className="bg-green-50 p-3 rounded-lg border border-green-200">
-                          <p className="text-gray-700">{decision}</p>
+
+                    <div className="space-y-3">
+                      {eventDetails.event.decisions.map((d) => (
+                        <div key={d._id} className="bg-green-50 p-4 rounded-xl border border-green-200">
+                          <p className="font-semibold text-gray-900">📝 {d.decision}</p>
+
+                          {d.responsable && (
+                            <p className="text-sm text-gray-700 mt-1">
+                              👤 Responsable: <span className="font-medium">{d.responsable}</span>
+                            </p>
+                          )}
                         </div>
                       ))}
                     </div>

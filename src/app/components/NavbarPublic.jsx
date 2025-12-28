@@ -1,17 +1,24 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Home, Calendar, Users, Briefcase, Clock, Search, LogIn, ChevronDown } from 'lucide-react';
 
 export default function NavbarPublic() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Detectar scroll para cambiar el estilo del navbar
-  if (typeof window !== 'undefined') {
-    window.addEventListener('scroll', () => {
+  // Detectar scroll solo cuando el componente esté montado
+  useEffect(() => {
+    const handleScroll = () => {
       setScrolled(window.scrollY > 50);
-    });
-  }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Limpiar evento al desmontar
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const navItems = [
     { name: 'Inicio', icon: Home, href: '#inicio' },

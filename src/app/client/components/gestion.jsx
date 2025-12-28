@@ -287,7 +287,7 @@ export default function GestionEventos() {
                             <FiFileText size={21} />
                           </button>
 
-                        <span className="
+                          <span className="
         absolute -top-9 left-1/2 -translate-x-1/2 
         px-3 py-1 text-[12px] font-medium rounded-md 
         bg-black/85 text-white shadow-md
@@ -295,10 +295,10 @@ export default function GestionEventos() {
         opacity-0 group-hover:opacity-100 transition
         pointer-events-none
       ">
-                          Descargar acta
-                        </span>
-                      </div>
-                    )}
+                            Descargar acta
+                          </span>
+                        </div>
+                      )}
 
                     {openMenu === event._id && event.status !== 'finalizado' && (
                       <div className="relative group">
