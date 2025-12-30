@@ -6,7 +6,6 @@ export default function NavbarPublic() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Detectar scroll solo cuando el componente esté montado
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -14,7 +13,6 @@ export default function NavbarPublic() {
 
     window.addEventListener('scroll', handleScroll);
 
-    // Limpiar evento al desmontar
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };

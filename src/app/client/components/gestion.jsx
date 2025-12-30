@@ -217,126 +217,190 @@ export default function GestionEventos() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative overflow-hidden">
-                  <div className="flex items-center gap-3 mt-3">
-                    <img
-                      src={event.organizer.profilePicture}
-                      alt="Organizador"
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
+                
+                <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative">
+                  {/* Organizador */}
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <img
+                        src={event.organizer.profilePicture}
+                        alt="Organizador"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                    </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">
+                      <p className="text-sm font-semibold text-gray-800">
                         {event.organizer.name} {event.organizer.apellido}
                       </p>
                       <div className="flex items-center gap-1 text-xs text-gray-500">
-                        <FiUsers size={12} />
-                        Organizador
+                        <FiUsers size={11} />
+                        <span>Organizador</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  {/* Botones de acciones */}
+                  <div className="flex items-center gap-1.5">
+                    {/* Botón Ver Asistentes */}
                     {openMenu === event._id && event.status === 'finalizado' && (
                       <div className="relative group">
-                        <button onClick={() => openAttendanceViewer(event._id)}
+                        <button
+                          onClick={() => openAttendanceViewer(event._id)}
                           className="
-        flex items-center justify-center text-emerald-600
-        hover:scale-110 transition-all duration-300
-      "
+            relative p-2 rounded-xl
+            bg-gradient-to-br from-emerald-500 to-green-600
+            text-white shadow-md
+            hover:shadow-lg hover:scale-105
+            active:scale-95
+            transition-all duration-200
+            overflow-hidden
+          "
                         >
-                          <FiUsers size={21} />
+                          <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          <FiUsers size={16} className="relative z-10" />
                         </button>
 
                         <span className="
-      absolute -top-9 left-1/2 -translate-x-1/2 
-      px-3 py-1 text-[12px] font-medium rounded-md 
-      bg-black/85 text-white shadow-md
-      whitespace-nowrap
-      opacity-0 group-hover:opacity-100 transition
-      pointer-events-none
-    ">
-                          Ver asistentes
+          absolute -top-9 left-1/2 -translate-x-1/2 
+          px-2.5 py-1 text-[11px] font-medium rounded-md 
+          bg-gray-900/90 text-white shadow-lg
+          whitespace-nowrap
+          opacity-0 group-hover:opacity-100 
+          transition-all duration-200
+          pointer-events-none
+          backdrop-blur-sm
+        ">
+                          Asistentes
                         </span>
                       </div>
                     )}
 
+                    {/* Botón Decisiones */}
                     {openMenu === event._id &&
                       event.status === 'finalizado' &&
                       event.type === 'reunion' && (
                         <div className="relative group">
                           <button
                             onClick={() => openDecisionsModal(event)}
-                            className="flex items-center justify-center text-purple-600 hover:scale-110 transition-all duration-300"
+                            className="
+              relative p-2 rounded-xl
+              bg-gradient-to-br from-purple-500 to-indigo-600
+              text-white shadow-md
+              hover:shadow-lg hover:scale-105
+              active:scale-95
+              transition-all duration-200
+              overflow-hidden
+            "
                           >
-                            <FiClipboard size={21} />
-                          </button>
-
-                          <span className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 text-[12px] font-medium rounded-md bg-black/85 text-white shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
-                            Gestionar decisiones
-                          </span>
-                        </div>
-                      )}
-
-                    {openMenu === event._id &&
-                      event.status === 'finalizado' && (
-                        <div className="relative group">
-                          <button
-                            onClick={() => downloadPDF(event._id, event.title)}
-                            className="flex items-center justify-center text-red-600 hover:scale-110 transition-all duration-300"
-                          >
-                            <FiFileText size={21} />
+                            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <FiClipboard size={16} className="relative z-10" />
                           </button>
 
                           <span className="
-        absolute -top-9 left-1/2 -translate-x-1/2 
-        px-3 py-1 text-[12px] font-medium rounded-md 
-        bg-black/85 text-white shadow-md
-        whitespace-nowrap
-        opacity-0 group-hover:opacity-100 transition
-        pointer-events-none
-      ">
-                            Descargar acta
+            absolute -top-9 left-1/2 -translate-x-1/2 
+            px-2.5 py-1 text-[11px] font-medium rounded-md 
+            bg-gray-900/90 text-white shadow-lg
+            whitespace-nowrap
+            opacity-0 group-hover:opacity-100 
+            transition-all duration-200
+            pointer-events-none
+            backdrop-blur-sm
+          ">
+                            Decisiones
                           </span>
                         </div>
                       )}
 
+                    {/* Botón Descargar PDF */}
+                    {openMenu === event._id && event.status === 'finalizado' && (
+                      <div className="relative group">
+                        <button
+                          onClick={() => downloadPDF(event._id, event.title)}
+                          className="
+            relative p-2 rounded-xl
+            bg-gradient-to-br from-red-500 to-rose-600
+            text-white shadow-md
+            hover:shadow-lg hover:scale-105
+            active:scale-95
+            transition-all duration-200
+            overflow-hidden
+          "
+                        >
+                          <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          <FiFileText size={16} className="relative z-10" />
+                        </button>
+
+                        <span className="
+          absolute -top-9 left-1/2 -translate-x-1/2 
+          px-2.5 py-1 text-[11px] font-medium rounded-md 
+          bg-gray-900/90 text-white shadow-lg
+          whitespace-nowrap
+          opacity-0 group-hover:opacity-100 
+          transition-all duration-200
+          pointer-events-none
+          backdrop-blur-sm
+        ">
+                          Descargar PDF
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Botón Registrar Asistencia */}
                     {openMenu === event._id && event.status !== 'finalizado' && (
                       <div className="relative group">
                         <button
                           onClick={() => openAttendanceModal(event)}
                           className="
-                            flex items-center justify-center text-blue-600
-                            hover:scale-110 transition-all duration-300
-                          "
+            relative p-2 rounded-xl
+            bg-gradient-to-br from-blue-500 to-cyan-600
+            text-white shadow-md
+            hover:shadow-lg hover:scale-105
+            active:scale-95
+            transition-all duration-200
+            overflow-hidden
+          "
                         >
-                          <FiEdit size={21} />
+                          <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                          <FiEdit size={16} className="relative z-10" />
                         </button>
 
                         <span className="
-                          absolute -top-9 left-1/2 -translate-x-1/2 
-                          px-3 py-1 text-[12px] font-medium rounded-md 
-                          bg-black/85 text-white shadow-md
-                          whitespace-nowrap
-                          opacity-0 group-hover:opacity-100 transition
-                          pointer-events-none
-                        ">
-                          Registrar asistencia
+          absolute -top-9 left-1/2 -translate-x-1/2 
+          px-2.5 py-1 text-[11px] font-medium rounded-md 
+          bg-gray-900/90 text-white shadow-lg
+          whitespace-nowrap
+          opacity-0 group-hover:opacity-100 
+          transition-all duration-200
+          pointer-events-none
+          backdrop-blur-sm
+        ">
+                          Registrar
                         </span>
                       </div>
                     )}
 
-                    <div className="relative group">
-                      <button
-                        onClick={() =>
-                          setOpenMenu(openMenu === event._id ? null : event._id)
+                    {/* Botón menú (siempre visible) */}
+                    <button
+                      onClick={() =>
+                        setOpenMenu(openMenu === event._id ? null : event._id)
+                      }
+                      className={`
+        p-2 rounded-xl
+        transition-all duration-200
+        ${openMenu === event._id
+                          ? 'bg-gray-200 text-gray-700 shadow-sm scale-95'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105'
                         }
-                        className="p-2 rounded-full hover:bg-gray-100 transition"
-                      >
-                        <FiMoreVertical className="text-gray-500" />
-                      </button>
-                    </div>
+        active:scale-90
+      `}
+                    >
+                      <FiMoreVertical size={16} />
+                    </button>
                   </div>
                 </div>
+
+                
               </div>
             </div>
           ))}
