@@ -36,7 +36,6 @@ export default function Usuarios() {
             setLoading(true);
             const res = await axios.get('/api/user/');
             setUserInfo(res.data);
-            console.log(res.data)
         } catch (err) {
             console.error(err);
             setError('Error al cargar residentes');
