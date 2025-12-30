@@ -217,7 +217,7 @@ export default function GestionEventos() {
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between gap-3 mt-6 pt-4 border-t relative">
                   {/* Organizador */}
                   <div className="flex items-center gap-3">
@@ -398,9 +398,7 @@ export default function GestionEventos() {
                       <FiMoreVertical size={16} />
                     </button>
                   </div>
-                </div>
-
-                
+                </div> 
               </div>
             </div>
           ))}

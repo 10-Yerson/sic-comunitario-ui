@@ -19,7 +19,6 @@ export default function EventosComunity() {
       try {
         const res = await axios.get('/api/event');
         setEvents(res.data);
-        console.log(res.data)
       } catch (error) {
         console.error('Error al obtener eventos:', error);
       } finally {
