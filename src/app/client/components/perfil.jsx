@@ -15,7 +15,6 @@ export default function UserProfile() {
     try {
       const { data } = await axios.get('/api/user/profile/me');
       setUser(data);
-      console.log(data)
     } catch (error) {
       console.error(error);
       toast.error('No se pudo cargar el perfil');

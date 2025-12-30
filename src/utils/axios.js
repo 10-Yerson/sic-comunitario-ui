@@ -5,6 +5,4 @@ const instance = axios.create({
     withCredentials: true, 
 });
 
-console.log('BASE URL:', process.env.NEXT_PUBLIC_BASE_URL);
-
 export default instance;

@@ -166,7 +166,7 @@ export default function Welcome() {
               icon={<FiFolder size={24} />}
               label="Historial"
               description="Ver actividades"
-              href="/client/history"
+              href="/client/gestion"
               color="purple"
             />
 
@@ -211,7 +211,7 @@ export default function Welcome() {
               label="Estado de cuenta" 
               value={
                 <span className="flex items-center gap-2">
-                  {data?.isVerified ? (
+                  {data?.isActive ? (
                     <>
                       <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                       <span className="text-green-700 font-medium">Verificado</span>
