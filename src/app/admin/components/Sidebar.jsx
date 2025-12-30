@@ -1,8 +1,12 @@
 'use client'
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FiUsers, FiFileText, FiHome, FiLogOut, FiClipboard, FiUserPlus, FiUser, FiPlusCircle, FiShield } from "react-icons/fi";
+import {
+  FiUsers, FiFileText, FiHome, FiLogOut, FiClipboard,
+  FiUserPlus, FiUser, FiPlusCircle, FiShield, FiMenu, FiX
+} from "react-icons/fi";
 import axios from '@/utils/axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -32,6 +37,14 @@ export default function Sidebar() {
         autoClose: 3000,
       });
     }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   const menuSections = [
@@ -68,42 +81,54 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className="w-72 h-screen bg-[#FCFEFD] text-gray-900 fixed shadow-2xl border-r border-gray-200 flex flex-col">
-        <div className="flex-1 px-4 py-6">
-          {menuSections.map((section, index) => (
-            <div key={index} className="mb-5">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-                {section.title}
-              </p>
-              <ul className="space-y-1">
-                {section.items.map((item, itemIndex) => (
-                  item.isLogout ? (
-                    <li key={itemIndex}>
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 p-3 w-full rounded-lg transition-all duration-300 hover:bg-red-50 hover:text-red-600 text-left"
-                      >
-                        <item.icon size={20} className="transition-transform" />
-                        <span className="font-medium text-sm">{item.text}</span>
-                      </button>
-                    </li>
-                  ) : (
-                    <SidebarItem
-                      key={item.href}
-                      href={item.href}
-                      icon={item.icon}
-                      text={item.text}
-                      active={pathname === item.href}
-                    />
-                  )
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+      {/* ========== BOTÓN HAMBURGUESA MÓVIL ========== */}
+      <button
+        onClick={toggleMobileMenu}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+      >
+        {isMobileMenuOpen ? (
+          <FiX size={24} className="text-gray-700" />
+        ) : (
+          <FiMenu size={24} className="text-gray-700" />
+        )}
+      </button>
+
+      {/* ========== OVERLAY MÓVIL ========== */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={closeMobileMenu}
+          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity"
+        />
+      )}
+
+      {/* ========== SIDEBAR DESKTOP (≥1024px) ========== */}
+      <div className="hidden lg:flex w-72 h-screen bg-[#FCFEFD] text-gray-900 fixed shadow-2xl border-r border-gray-200 flex-col">
+        <SidebarContent
+          menuSections={menuSections}
+          pathname={pathname}
+          handleLogout={handleLogout}
+          closeMobileMenu={() => { }}
+        />
       </div>
 
-      {/* Toast Container con diseño personalizado */}
+      {/* ========== SIDEBAR MÓVIL (<1024px) ========== */}
+      <div
+        className={`
+          lg:hidden fixed top-0 left-0 h-screen w-72 bg-[#FCFEFD] text-gray-900 
+          shadow-2xl border-r border-gray-200 z-40
+          transform transition-transform duration-300 ease-in-out
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <SidebarContent
+          menuSections={menuSections}
+          pathname={pathname}
+          handleLogout={handleLogout}
+          closeMobileMenu={closeMobileMenu}
+        />
+      </div>
+
+      {/* ========== TOAST CONTAINER ========== */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -125,14 +150,64 @@ export default function Sidebar() {
   );
 }
 
-function SidebarItem({ href, icon: Icon, text, active }) {
+// ========== COMPONENTE DE CONTENIDO DEL SIDEBAR ========== 
+function SidebarContent({ menuSections, pathname, handleLogout, closeMobileMenu }) {
+  return (
+    <div className="flex-1 px-4 py-6">
+      <div className="px-3">
+        <p className="hidden md:block text-sm text-gray-500">
+           ­
+        </p>
+
+      </div>
+
+      {menuSections.map((section, index) => (
+        <div key={index} className="mb-5">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+            {section.title}
+          </p>
+          <ul className="space-y-1">
+            {section.items.map((item, itemIndex) => (
+              item.isLogout ? (
+                <li key={itemIndex}>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      closeMobileMenu();
+                    }}
+                    className="flex items-center gap-3 p-3 w-full rounded-lg transition-all duration-300 hover:bg-red-50 hover:text-red-600 text-left"
+                  >
+                    <item.icon size={20} className="transition-transform" />
+                    <span className="font-medium text-sm">{item.text}</span>
+                  </button>
+                </li>
+              ) : (
+                <SidebarItem
+                  key={item.href}
+                  href={item.href}
+                  icon={item.icon}
+                  text={item.text}
+                  active={pathname === item.href}
+                  onClick={closeMobileMenu}
+                />
+              )
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ========== ITEM DEL SIDEBAR ========== 
+function SidebarItem({ href, icon: Icon, text, active, onClick }) {
   return (
     <li>
       <Link
         href={href}
-        className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-          active ? "bg-[#31DCB7] text-white" : "hover:bg-[#5060BC] hover:text-white"
-        }`}
+        onClick={onClick}
+        className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${active ? "bg-[#31DCB7] text-white" : "hover:bg-[#5060BC] hover:text-white"
+          }`}
       >
         <Icon size={20} className={`${active ? "" : "group-hover:scale-110"} transition-transform`} />
         <span className="font-medium text-sm">{text}</span>
