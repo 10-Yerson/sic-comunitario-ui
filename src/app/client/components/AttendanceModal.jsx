@@ -74,7 +74,6 @@ export default function AttendanceModal({ event, onClose }) {
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden">
 
-        {/* HEADER */}
         <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-7 py-5">
           <div className="flex justify-between items-start">
             <div>
@@ -89,7 +88,6 @@ export default function AttendanceModal({ event, onClose }) {
             </button>
           </div>
 
-          {/* Stats pills */}
           <div className="flex items-center gap-2 mt-4 flex-wrap">
             <span className="bg-white/10 text-white text-xs px-3 py-1 rounded-full font-medium">
               {selectedCount} / {residents.length} registrados
@@ -111,7 +109,6 @@ export default function AttendanceModal({ event, onClose }) {
             )}
           </div>
 
-          {/* Progress bar */}
           <div className="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div
               className="h-full bg-emerald-400 rounded-full transition-all duration-500"
@@ -120,7 +117,6 @@ export default function AttendanceModal({ event, onClose }) {
           </div>
         </div>
 
-        {/* TOOLBAR */}
         <div className="px-7 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
           <p className="text-xs text-gray-400">{residents.length} residentes en total</p>
           <button
@@ -131,7 +127,6 @@ export default function AttendanceModal({ event, onClose }) {
           </button>
         </div>
 
-        {/* TABLE */}
         <div className="overflow-auto max-h-[50vh]">
           <table className="w-full text-sm">
             <thead>
@@ -148,12 +143,11 @@ export default function AttendanceModal({ event, onClose }) {
                 return (
                   <tr
                     key={r._id}
-                    className={`transition-colors ${
-                      status === 'asistio' ? 'bg-emerald-50/40' :
-                      status === 'falto' ? 'bg-red-50/30' :
-                      status === 'justificado' ? 'bg-amber-50/30' :
-                      'hover:bg-gray-50/60'
-                    }`}
+                    className={`transition-colors ${status === 'asistio' ? 'bg-emerald-50/40' :
+                        status === 'falto' ? 'bg-red-50/30' :
+                          status === 'justificado' ? 'bg-amber-50/30' :
+                            'hover:bg-gray-50/60'
+                      }`}
                   >
                     <td className="px-7 py-3">
                       <div className="flex items-center gap-3">
@@ -166,12 +160,11 @@ export default function AttendanceModal({ event, onClose }) {
                     <td className="px-4 py-3 text-gray-500 font-mono text-xs">{r.cedula}</td>
                     <td className="px-4 py-3">
                       <select
-                        className={`border rounded-lg px-3 py-1.5 text-xs font-medium w-44 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-colors cursor-pointer ${
-                          status === 'asistio' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
-                          status === 'falto' ? 'border-red-200 bg-red-50 text-red-700' :
-                          status === 'justificado' ? 'border-amber-200 bg-amber-50 text-amber-700' :
-                          'border-gray-200 bg-white text-gray-500'
-                        }`}
+                        className={`border rounded-lg px-3 py-1.5 text-xs font-medium w-44 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-colors cursor-pointer ${status === 'asistio' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
+                            status === 'falto' ? 'border-red-200 bg-red-50 text-red-700' :
+                              status === 'justificado' ? 'border-amber-200 bg-amber-50 text-amber-700' :
+                                'border-gray-200 bg-white text-gray-500'
+                          }`}
                         value={status || ''}
                         onChange={(e) => updateStatus(r._id, e.target.value)}
                       >
@@ -199,7 +192,6 @@ export default function AttendanceModal({ event, onClose }) {
           </table>
         </div>
 
-        {/* FOOTER */}
         <div className="px-7 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
           <p className="text-xs text-gray-400">
             {selectedCount === 0 ? 'Ningún residente registrado aún' : `${residents.length - selectedCount} sin registrar`}
