@@ -8,7 +8,6 @@ export default function AttendanceModal({ event, onClose }) {
   const [attendance, setAttendance] = useState({});
   const [saving, setSaving] = useState(false);
 
-  // Contar cuántos tienen status seleccionado
   const selectedCount = residents.filter(r => attendance[r._id]?.status).length;
   const asistenCount = residents.filter(r => attendance[r._id]?.status === 'asistio').length;
   const faltoCount = residents.filter(r => attendance[r._id]?.status === 'falto').length;
@@ -25,67 +24,40 @@ export default function AttendanceModal({ event, onClose }) {
       ...attendance,
       [id]: {
         status,
-        justification: status === 'justificado'
-          ? attendance[id]?.justification || ''
-          : ''
+        justification: status === 'justificado' ? attendance[id]?.justification || '' : ''
       }
     });
   };
 
   const updateJustification = (id, text) => {
-    setAttendance({
-      ...attendance,
-      [id]: {
-        ...attendance[id],
-        justification: text
-      }
-    });
+    setAttendance({ ...attendance, [id]: { ...attendance[id], justification: text } });
   };
 
-  // ✅ Función para marcar a todos como asistentes
   const markAllAsAttended = () => {
     const newAttendance = {};
-    residents.forEach(r => {
-      newAttendance[r._id] = {
-        status: 'asistio',
-        justification: ''
-      };
-    });
+    residents.forEach(r => { newAttendance[r._id] = { status: 'asistio', justification: '' }; });
     setAttendance(newAttendance);
   };
 
   const saveAttendance = async () => {
     setSaving(true);
-
-    // ✅ SOLO enviar residentes que tienen un status seleccionado
     const attendances = residents
-      .filter(r => attendance[r._id]?.status) // Solo los que tienen status
+      .filter(r => attendance[r._id]?.status)
       .map(r => ({
         residentId: r._id,
         status: attendance[r._id].status,
         justification: attendance[r._id]?.justification || ''
       }));
 
-    // Validar que se haya seleccionado al menos uno
     if (attendances.length === 0) {
       alert('Debes seleccionar el estado de al menos un residente');
       setSaving(false);
       return;
     }
 
-    console.log('📤 Enviando asistencias:', attendances);
-
     try {
-      await axios.post('/api/attendance/bulk', {
-        eventId: event._id,
-        attendances
-      });
-
-      // 2️⃣ Cambiar estado del evento
-      await axios.patch(`/api/event/${event._id}/status`, {
-        status: 'finalizado'
-      });
-
+      await axios.post('/api/attendance/bulk', { eventId: event._id, attendances });
+      await axios.patch(`/api/event/${event._id}/status`, { status: 'finalizado' });
       alert('Asistencia registrada y evento finalizado');
       onClose();
     } catch (error) {
@@ -96,113 +68,159 @@ export default function AttendanceModal({ event, onClose }) {
     }
   };
 
+  const progress = residents.length > 0 ? (selectedCount / residents.length) * 100 : 0;
+
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
-      <div className="bg-white w-full max-w-5xl rounded-3xl p-6">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-5">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">
-              Asistencia · {event.title}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {selectedCount} de {residents.length} registrados
-              {selectedCount > 0 && (
-                <span className="ml-2">
-                  (✅ {asistenCount} · ❌ {faltoCount} · 📋 {justificadoCount})
-                </span>
-              )}
-            </p>
+        <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-7 py-5">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Registro de Asistencia</p>
+              <h2 className="text-white text-xl font-bold">{event.title}</h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-slate-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10"
+            >
+              ✕
+            </button>
           </div>
-          <button onClick={onClose} className="text-xl">✕</button>
+
+          {/* Stats pills */}
+          <div className="flex items-center gap-2 mt-4 flex-wrap">
+            <span className="bg-white/10 text-white text-xs px-3 py-1 rounded-full font-medium">
+              {selectedCount} / {residents.length} registrados
+            </span>
+            {asistenCount > 0 && (
+              <span className="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-medium">
+                ✅ {asistenCount} asistieron
+              </span>
+            )}
+            {faltoCount > 0 && (
+              <span className="bg-red-500/20 text-red-300 text-xs px-3 py-1 rounded-full font-medium">
+                ❌ {faltoCount} faltaron
+              </span>
+            )}
+            {justificadoCount > 0 && (
+              <span className="bg-amber-500/20 text-amber-300 text-xs px-3 py-1 rounded-full font-medium">
+                📋 {justificadoCount} justificados
+              </span>
+            )}
+          </div>
+
+          {/* Progress bar */}
+          <div className="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-emerald-400 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
 
-        {/* TABLE */}
-        <div className="mb-3 flex justify-end">
+        {/* TOOLBAR */}
+        <div className="px-7 py-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <p className="text-xs text-gray-400">{residents.length} residentes en total</p>
           <button
             onClick={markAllAsAttended}
-            className="px-4 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-sm font-medium"
+            className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 text-xs font-semibold transition-colors"
           >
             ✅ Marcar todos como asistentes
           </button>
         </div>
 
-        <div className="overflow-auto max-h-[60vh]">
-          <table className="w-full text-sm border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-2 text-left">Nombre</th>
-                <th className="p-2 text-left">Cédula</th>
-                <th className="p-2 text-left">Estado</th>
-                <th className="p-2 text-left">Motivo (si justifica)</th>
+        {/* TABLE */}
+        <div className="overflow-auto max-h-[50vh]">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100">
+                <th className="px-7 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Residente</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Cédula</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Estado</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Justificación</th>
               </tr>
             </thead>
-
-            <tbody>
-              {residents.map(r => (
-                <tr key={r._id} className="border-t">
-                  <td className="p-2">
-                    {r.name} {r.apellido}
-                  </td>
-                  <td className="p-2">{r.cedula}</td>
-
-                  {/* ESTADO - ✅ Valores corregidos para coincidir con el enum del modelo */}
-                  <td className="p-2">
-                    <select
-                      className="border rounded px-2 py-1 w-full"
-                      value={attendance[r._id]?.status || ''}
-                      onChange={(e) =>
-                        updateStatus(r._id, e.target.value)
-                      }
-                    >
-                      <option value="">Seleccionar</option>
-                      <option value="asistio">✅ Asistió</option>
-                      <option value="falto">❌ No asistió</option>
-                      <option value="justificado">📋 Justificado</option>
-                    </select>
-                  </td>
-
-                  {/* JUSTIFICACIÓN */}
-                  <td className="p-2">
-                    {attendance[r._id]?.status === 'justificado' && (
-                      <input
-                        type="text"
-                        placeholder="Motivo de la justificación"
-                        className="w-full border rounded px-2 py-1"
-                        value={attendance[r._id]?.justification || ''}
-                        onChange={(e) =>
-                          updateJustification(r._id, e.target.value)
-                        }
-                      />
-                    )}
-                  </td>
-                </tr>
-              ))}
+            <tbody className="divide-y divide-gray-50">
+              {residents.map((r, i) => {
+                const status = attendance[r._id]?.status;
+                return (
+                  <tr
+                    key={r._id}
+                    className={`transition-colors ${
+                      status === 'asistio' ? 'bg-emerald-50/40' :
+                      status === 'falto' ? 'bg-red-50/30' :
+                      status === 'justificado' ? 'bg-amber-50/30' :
+                      'hover:bg-gray-50/60'
+                    }`}
+                  >
+                    <td className="px-7 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-semibold text-xs flex-shrink-0">
+                          {r.name?.[0]}{r.apellido?.[0]}
+                        </div>
+                        <span className="font-medium text-gray-800">{r.name} {r.apellido}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500 font-mono text-xs">{r.cedula}</td>
+                    <td className="px-4 py-3">
+                      <select
+                        className={`border rounded-lg px-3 py-1.5 text-xs font-medium w-44 focus:outline-none focus:ring-2 focus:ring-slate-300 transition-colors cursor-pointer ${
+                          status === 'asistio' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
+                          status === 'falto' ? 'border-red-200 bg-red-50 text-red-700' :
+                          status === 'justificado' ? 'border-amber-200 bg-amber-50 text-amber-700' :
+                          'border-gray-200 bg-white text-gray-500'
+                        }`}
+                        value={status || ''}
+                        onChange={(e) => updateStatus(r._id, e.target.value)}
+                      >
+                        <option value="">Seleccionar</option>
+                        <option value="asistio">✅ Asistió</option>
+                        <option value="falto">❌ No asistió</option>
+                        <option value="justificado">📋 Justificado</option>
+                      </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      {status === 'justificado' && (
+                        <input
+                          type="text"
+                          placeholder="Motivo..."
+                          className="w-full border border-amber-200 bg-amber-50 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-amber-200 placeholder:text-amber-300 text-amber-800"
+                          value={attendance[r._id]?.justification || ''}
+                          onChange={(e) => updateJustification(r._id, e.target.value)}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
 
         {/* FOOTER */}
-        <div className="flex justify-end gap-3 mt-5">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={saveAttendance}
-            disabled={saving || selectedCount === 0}
-            className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {saving
-              ? 'Guardando...'
-              : selectedCount > 0
+        <div className="px-7 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+          <p className="text-xs text-gray-400">
+            {selectedCount === 0 ? 'Ningún residente registrado aún' : `${residents.length - selectedCount} sin registrar`}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={saveAttendance}
+              disabled={saving || selectedCount === 0}
+              className="px-6 py-2 text-sm font-semibold bg-slate-800 text-white rounded-xl hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {saving ? 'Guardando...' : selectedCount > 0
                 ? `Guardar ${selectedCount} asistencia${selectedCount > 1 ? 's' : ''}`
-                : 'Guardar asistencia'
-            }
-          </button>
+                : 'Guardar asistencia'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
