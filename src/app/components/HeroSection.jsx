@@ -42,7 +42,7 @@ export default function HeroSection() {
               </a>
               
               <a
-                href="#features"
+                href="#sobre-nosotros"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-white/10 backdrop-blur-sm text-white font-semibold text-lg hover:bg-white/20 border border-white/30 transition-all duration-300"
               >
                 Conocer más

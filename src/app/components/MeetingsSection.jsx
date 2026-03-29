@@ -79,6 +79,14 @@ export default function MeetingsSection() {
     );
   }
 
+  const formatColombiaTime = (timeStr) => {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours % 12 || 12;
+    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
   return (
     <>
       <section id="reuniones" className="py-24 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden">
@@ -177,11 +185,21 @@ export default function MeetingsSection() {
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Calendar className="w-4 h-4 text-blue-500" />
-                          <span>{meeting.date}</span>
+                          <span>{new Date(meeting.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Clock className="w-4 h-4 text-blue-500" />
-                          <span>{meeting.startTime} - {meeting.endTime}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                              <span className="text-blue-600 font-medium">{formatColombiaTime(meeting.startTime)}</span>
+                            </div>
+                            <span className="text-gray-300">|</span>
+                            <div className="flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                              <span className="text-slate-500 font-medium">{formatColombiaTime(meeting.endTime)}</span>
+                            </div>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <MapPin className="w-4 h-4 text-blue-500" />
@@ -223,28 +241,51 @@ export default function MeetingsSection() {
                     key={work._id}
                     className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-emerald-200 group hover:-translate-y-2 relative"
                   >
-                    {/* Imagen con overlay */}
-                    {work.media?.url && (
-                      <div className="h-56 overflow-hidden relative">
-                        <img
-                          src={work.media.url}
-                          alt={work.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-
-                        {/* Badge flotante */}
-                        <div className="absolute top-4 right-4">
-                          <span className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${work.status === 'en_curso'
-                            ? 'bg-emerald-400 text-emerald-900'
-                            : 'bg-teal-400 text-teal-900'
-                            }`}>
-                            {work.status === 'en_curso' ? '⚡ En Curso' : '📅 Programado'}
-                          </span>
+                    <div className="h-56 overflow-hidden relative">
+                      {work.media?.url ? (
+                        work.media.type === 'video' ? (
+                          <>
+                            <video
+                              src={work.media.url}
+                              className="w-full h-full object-contain bg-black"
+                              controls
+                              preload="metadata"
+                              controlsList="nodownload noremoteplayback"
+                              disablePictureInPicture
+                            />
+                            <div className="absolute top-4 right-4 z-10">
+                              <span className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${work.status === 'en_curso'
+                                ? 'bg-emerald-400 text-emerald-900'
+                                : 'bg-teal-400 text-teal-900'
+                                }`}>
+                                {work.status === 'en_curso' ? '⚡ En Curso' : '📅 Programado'}
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <img
+                              src={work.media.url}
+                              alt={work.title}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                            <div className="absolute top-4 right-4">
+                              <span className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm ${work.status === 'en_curso'
+                                ? 'bg-emerald-400 text-emerald-900'
+                                : 'bg-teal-400 text-teal-900'
+                                }`}>
+                                {work.status === 'en_curso' ? '⚡ En Curso' : '📅 Programado'}
+                              </span>
+                            </div>
+                          </>
+                        )
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center text-white font-bold text-lg text-center px-4">
+                          📁 Este trabajo no cuenta con archivos multimedia
                         </div>
-                      </div>
-                    )}
-
+                      )}
+                    </div>
                     <div className="p-6">
                       <h4 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-emerald-600 transition-colors">
                         {work.title}
@@ -262,7 +303,18 @@ export default function MeetingsSection() {
 
                         <div className="flex items-center gap-2 text-sm text-gray-600">
                           <Clock className="w-4 h-4 text-emerald-500" />
-                          <span>{work.startTime} - {work.endTime}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2 py-0.5 rounded-md">
+                              Inicio
+                            </span>
+                            <span>{formatColombiaTime(work.startTime)}</span>
+                            <span className="text-gray-400 mx-1">→</span>
+                            <span className="bg-slate-100 text-slate-600 text-xs font-semibold px-2 py-0.5 rounded-md">
+                              Fin
+                            </span>
+                            <span>{formatColombiaTime(work.endTime)}</span>
+                          </div>
+
                         </div>
 
                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -436,7 +488,19 @@ export default function MeetingsSection() {
                       <Clock className="w-5 h-5 text-blue-600" />
                       <span className="font-semibold text-gray-700">Horario</span>
                     </div>
-                    <p className="text-gray-900 font-medium">{eventDetails.event.startTime} - {eventDetails.event.endTime}</p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                        <span className="text-xs text-blue-500 font-semibold">Inicio</span>
+                        <span className="text-gray-900 font-medium ml-0.5">{formatColombiaTime(eventDetails.event.startTime)}</span>
+                      </div>
+                      <span className="text-gray-300">|</span>
+                      <div className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        <span className="text-xs text-slate-500 font-semibold">Fin</span>
+                        <span className="text-gray-900 font-medium ml-0.5">{formatColombiaTime(eventDetails.event.endTime)}</span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="bg-gray-50 rounded-xl p-4">
@@ -536,7 +600,7 @@ export default function MeetingsSection() {
                 )}
 
                 {/* Estadísticas de Asistencia */}
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200 mb-6">
+                {/* <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200 mb-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Estadísticas de Asistencia</h3>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center">
@@ -552,7 +616,7 @@ export default function MeetingsSection() {
                       <div className="text-sm text-gray-600">Justificados</div>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Organizador */}
                 <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
