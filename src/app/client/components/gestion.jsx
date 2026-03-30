@@ -409,7 +409,7 @@ export default function GestionEventos() {
         <AttendanceModal
           event={selectedEvent}
           onClose={() => setOpenAttendance(false)}
-          onSuccess={() => {        // 👈 solo se llama al guardar
+          onSuccess={() => { 
             setOpenAttendance(false);
             fetchMyEvents();
           }}
@@ -427,6 +427,7 @@ export default function GestionEventos() {
         <DecisionsModal
           event={decisionsEvent}
           onClose={closeDecisionsModal}
+          onUpdate={fetchMyEvents}
         />
       )}
     </div>

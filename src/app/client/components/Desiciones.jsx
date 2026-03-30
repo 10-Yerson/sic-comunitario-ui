@@ -8,7 +8,7 @@ import {
   FiFileText, FiUser, FiAlertCircle, FiCheck
 } from 'react-icons/fi';
 
-export default function DecisionsModal({ event, onClose }) {
+export default function DecisionsModal({ event, onClose, onUpdate }) {
   const [decisions, setDecisions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -41,6 +41,7 @@ export default function DecisionsModal({ event, onClose }) {
       setDecisions(res.data.event.decisions || []);
       setNewDecision({ decision: '', responsable: '' });
       toast.success('Decisión guardada exitosamente');
+      onUpdate?.(); 
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || 'Error al guardar la decisión');
@@ -50,13 +51,13 @@ export default function DecisionsModal({ event, onClose }) {
   };
 
   const handleDeleteDecision = async (decisionId, index) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta decisión?')) return;
     try {
       setSaving(true);
       const updatedDecisions = decisions.filter((_, i) => i !== index);
       await axios.put(`/api/event/${event._id}/decisions`, { decisions: updatedDecisions });
       setDecisions(updatedDecisions);
       toast.success('Decisión eliminada exitosamente');
+      onUpdate?.();
     } catch (err) {
       console.error(err);
       toast.error('Error al eliminar la decisión');
