@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import axios from '@/utils/axios';
+import { toast } from 'react-toastify';
 
-export default function AttendanceModal({ event, onClose }) {
+export default function AttendanceModal({ event, onClose, onSuccess }) {
   const [residents, setResidents] = useState([]);
   const [attendance, setAttendance] = useState({});
   const [saving, setSaving] = useState(false);
@@ -50,7 +51,7 @@ export default function AttendanceModal({ event, onClose }) {
       }));
 
     if (attendances.length === 0) {
-      alert('Debes seleccionar el estado de al menos un residente');
+      toast.warning('Debes seleccionar el estado de al menos un residente');
       setSaving(false);
       return;
     }
@@ -58,11 +59,12 @@ export default function AttendanceModal({ event, onClose }) {
     try {
       await axios.post('/api/attendance/bulk', { eventId: event._id, attendances });
       await axios.patch(`/api/event/${event._id}/status`, { status: 'finalizado' });
-      alert('Asistencia registrada y evento finalizado');
+      toast.success('Asistencia registrada y evento finalizado');
+       onSuccess();
       onClose();
     } catch (error) {
       console.error(error);
-      alert('Error al registrar asistencia');
+      toast.error('Error al registrar asistencia');
     } finally {
       setSaving(false);
     }

@@ -398,7 +398,7 @@ export default function GestionEventos() {
                       <FiMoreVertical size={16} />
                     </button>
                   </div>
-                </div> 
+                </div>
               </div>
             </div>
           ))}
@@ -409,6 +409,10 @@ export default function GestionEventos() {
         <AttendanceModal
           event={selectedEvent}
           onClose={() => setOpenAttendance(false)}
+          onSuccess={() => {        // 👈 solo se llama al guardar
+            setOpenAttendance(false);
+            fetchMyEvents();
+          }}
         />
       )}
 
