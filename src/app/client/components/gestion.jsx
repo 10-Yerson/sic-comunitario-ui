@@ -111,26 +111,41 @@ export default function GestionEventos() {
 
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Mis eventos
-        </h1>
-        <p className="text-gray-500">
-          Gestión de reuniones y trabajos comunitarios
-        </p>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-xs font-semibold text-green-600 uppercase tracking-widest mb-1">Panel de colaborador</p>
+            <h1 className="text-2xl font-bold text-gray-800">Mis Eventos</h1>
+            <p className="text-gray-400 text-sm mt-0.5">Gestión de reuniones y trabajos comunitarios</p>
+          </div>
+        </div>
+
+        {stats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'Total', value: stats.total, icon: '📅', color: 'bg-blue-50 text-blue-600' },
+              { label: 'Reuniones', value: stats.reuniones, icon: '🤝', color: 'bg-purple-50 text-purple-600' },
+              { label: 'Trabajos', value: stats.trabajos, icon: '🔧', color: 'bg-amber-50 text-amber-600' },
+              { label: 'Programados', value: stats.programados, icon: '🕐', color: 'bg-green-50 text-green-600' },
+            ].map(s => (
+              <div key={s.label} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                <div className="flex items-center justify-between mb-3">
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${s.color}`}>{s.label}</span>
+                  <span className="text-lg">{s.icon}</span>
+                </div>
+                <p className="text-3xl font-bold text-gray-800">{s.value}</p>
+                <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full ${s.color.replace('bg-', 'bg-').replace('50', '400').replace('text-', '')}`}
+                    style={{ width: s.value > 0 ? '100%' : '0%', transition: 'width 0.8s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <Stat label="Total" value={stats.total} />
-          <Stat label="Reuniones" value={stats.reuniones} />
-          <Stat label="Trabajos" value={stats.trabajos} />
-          <Stat label="Programados" value={stats.programados} />
-        </div>
-      )}
-
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {events.map((event) => (
             <div
@@ -409,7 +424,7 @@ export default function GestionEventos() {
         <AttendanceModal
           event={selectedEvent}
           onClose={() => setOpenAttendance(false)}
-          onSuccess={() => { 
+          onSuccess={() => {
             setOpenAttendance(false);
             fetchMyEvents();
           }}
