@@ -4,227 +4,198 @@ import React, { useEffect, useState } from "react";
 import axios from '../../../utils/axios'
 import Link from 'next/link';
 import { MdVerified } from "react-icons/md";
-import { 
-  FiCalendar, 
-  FiUsers, 
-  FiUser, 
-  FiFolder, 
-  FiTrendingUp,
-  FiClock,
-  FiMapPin
+import {
+  FiCalendar, FiUsers, FiUser, FiFolder,
+  FiTrendingUp, FiClock, FiMapPin, FiChevronRight
 } from "react-icons/fi";
 
 export default function Welcome() {
   const [data, setData] = useState({});
-  const [stats, setStats] = useState({
-    total: 0,
-    reuniones: 0,
-    trabajos: 0
-  });
+  const [stats, setStats] = useState({ total: 0, reuniones: 0, trabajos: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1️⃣ obtener usuario logueado
         const { data } = await axios.get('/api/auth/user-info');
         const userId = data.userId;
-
         const userRes = await axios.get(`/api/user/${userId}`);
         setData(userRes.data);
-
-        // 2️⃣ obtener eventos del colaborador
         const eventsRes = await axios.get('/api/event/my');
         setStats(eventsRes.data.stats || {});
-
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
-          <p className="text-gray-500 font-medium">Cargando panel...</p>
+          <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+          <p className="text-gray-400 text-sm font-medium">Cargando panel...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      
-      {/* ========== HEADER CON HERO ========== */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="h-full bg-gray-50">
+
+      <div className="bg-white border-b border-gray-100">
+        <div className="mx-auto px-6 py-9">
           <div className="flex items-center justify-between">
-            
-            {/* Usuario info */}
-            <div className="flex items-center gap-4">
-              <div className="relative">
+            <div className="flex items-center gap-5">
+              <div className="relative flex-shrink-0">
                 <img
-                  className="h-16 w-16 md:h-20 md:w-20 rounded-2xl object-cover border-4 border-white/30 shadow-xl"
-                  src={
-                    data?.profilePicture ||
-                    "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                  }
+                  className="h-16 w-16 rounded-2xl object-cover ring-4 ring-green-100"
+                  src={data?.profilePicture || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
                   alt="Profile"
                 />
                 {data?.isVerified && (
-                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
-                    <MdVerified className="text-blue-500" size={20} />
+                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow">
+                    <MdVerified className="text-blue-500" size={18} />
                   </div>
                 )}
               </div>
-              
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-                  ¡Hola, {data?.name}!
-                </h1>
-                <p className="text-green-100 text-sm md:text-base mt-1">
-                  Bienvenido a tu panel de colaborador
-                </p>
+                <p className="text-xs font-semibold text-green-600 uppercase tracking-widest mb-0.5">Panel de colaborador</p>
+                <h1 className="text-2xl font-bold text-gray-800">¡Hola, {data?.name}! 👋</h1>
+                <p className="text-gray-400 text-sm mt-0.5">Aquí tienes un resumen de tu actividad</p>
               </div>
             </div>
 
-            {/* Link a perfil (desktop) */}
-            <Link 
+            <Link
               href="/client/perfil"
-              className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all backdrop-blur-sm"
+              className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-all text-sm font-medium text-gray-600"
             >
-              <FiUser size={18} />
-              <span className="font-medium">Ver Perfil</span>
+              <FiUser size={15} /> Ver perfil
             </Link>
           </div>
         </div>
       </div>
 
-      {/* ========== CONTENIDO PRINCIPAL ========== */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mx-auto px-6 py-8 space-y-8">
 
-        {/* ========== ESTADÍSTICAS ========== */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          
-          {/* Total de eventos */}
+        <div className="grid grid-cols-3 gap-5">
           <StatCard
-            icon={<FiCalendar className="text-purple-600" size={32} />}
-            title="Total de Eventos"
+            icon={<FiCalendar size={20} />}
+            label="Total eventos"
             value={stats.total || 0}
-            subtitle="Eventos gestionados"
-            gradient="from-purple-500 to-indigo-600"
-            iconBg="bg-purple-100"
+            color="purple"
           />
-
-          {/* Trabajos comunitarios */}
           <StatCard
-            icon={<FiUsers className="text-blue-600" size={32} />}
-            title="Trabajos Comunitarios"
+            icon={<FiUsers size={20} />}
+            label="Trabajos comunitarios"
             value={stats.trabajos || 0}
-            subtitle="Actividades organizadas"
-            gradient="from-blue-500 to-cyan-600"
-            iconBg="bg-blue-100"
+            color="blue"
           />
-
-          {/* Reuniones */}
           <StatCard
-            icon={<FiClock className="text-green-600" size={32} />}
-            title="Reuniones"
+            icon={<FiClock size={20} />}
+            label="Reuniones"
             value={stats.reuniones || 0}
-            subtitle="Reuniones realizadas"
-            gradient="from-green-500 to-emerald-600"
-            iconBg="bg-green-100"
+            color="green"
           />
         </div>
 
-        {/* ========== ACCIONES RÁPIDAS ========== */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-6">
-            <FiTrendingUp className="text-gray-700" size={24} />
-            <h2 className="text-2xl font-bold text-gray-800">
-              Acciones Rápidas
-            </h2>
+        <div className="grid md:grid-cols-2 gap-6">
+
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-5">
+              <FiTrendingUp className="text-gray-500" size={16} />
+              <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Acciones rápidas</h2>
+            </div>
+            <div className="space-y-2">
+              {[
+                { icon: <FiCalendar size={16} />, label: 'Mis Eventos', desc: 'Ver y gestionar tus eventos', href: '/client/gestion', color: 'text-blue-500 bg-blue-50' },
+                { icon: <FiFolder size={16} />, label: 'Historial', desc: 'Consultar actividades pasadas', href: '/client/gestion', color: 'text-purple-500 bg-purple-50' },
+                { icon: <FiUser size={16} />, label: 'Mi Perfil', desc: 'Editar información personal', href: '/client/perfil', color: 'text-green-500 bg-green-50' },
+                { icon: <FiMapPin size={16} />, label: 'Crear Evento', desc: 'Organizar un nuevo evento', href: '/client/event', color: 'text-orange-500 bg-orange-50' },
+              ].map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center gap-4 p-3.5 rounded-xl hover:bg-gray-50 transition-all group"
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                    {item.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800">{item.label}</p>
+                    <p className="text-xs text-gray-400">{item.desc}</p>
+                  </div>
+                  <FiChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            
-            <ActionButton
-              icon={<FiCalendar size={24} />}
-              label="Mis Eventos"
-              description="Gestionar eventos"
-              href="/client/gestion"
-              color="blue"
-            />
+          {/* Info del colaborador */}
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
 
-            <ActionButton
-              icon={<FiFolder size={24} />}
-              label="Historial"
-              description="Ver actividades"
-              href="/client/gestion"
-              color="purple"
-            />
+            <div className="bg-gray-50 border-b border-gray-100 px-6 py-5">
+              <div className="flex items-center gap-4">
+                <img
+                  className="h-14 w-14 rounded-xl object-cover ring-4 ring-gray-200"
+                  src={data?.profilePicture || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+                  alt="Profile"
+                />
+                <div>
+                  <p className="text-gray-800 font-bold text-lg">{data?.name} {data?.apellido}</p>
+                  <p className="text-gray-400 text-xs">Colaborador Comunitario</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {data?.isActive ? (
+                      <>
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                        <span className="text-green-600 text-xs font-medium">Cuenta verificada</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full" />
+                        <span className="text-yellow-600 text-xs font-medium">Pendiente de verificación</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <ActionButton
-              icon={<FiUser size={24} />}
-              label="Mi Perfil"
-              description="Editar datos"
-              href="/client/perfil"
-              color="green"
-            />
-
-            <ActionButton
-              icon={<FiMapPin size={24} />}
-              label="Crear Evento"
-              description="Nuevo evento"
-              href="/client/event"
-              color="orange"
-            />
-          </div>
-        </div>
-
-        {/* ========== INFORMACIÓN ADICIONAL ========== */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">
-            Información del Colaborador
-          </h3>
-          
-          <div className="grid md:grid-cols-2 gap-4">
-            <InfoItem 
-              label="Nombre completo" 
-              value={`${data?.name} ${data?.apellido}`} 
-            />
-            <InfoItem 
-              label="Email" 
-              value={data?.email} 
-            />
-            <InfoItem 
-              label="Rol" 
-              value="Colaborador Comunitario" 
-            />
-            <InfoItem 
-              label="Estado de cuenta" 
-              value={
-                <span className="flex items-center gap-2">
-                  {data?.isActive ? (
-                    <>
-                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                      <span className="text-green-700 font-medium">Verificado</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                      <span className="text-yellow-700 font-medium">Pendiente</span>
-                    </>
-                  )}
-                </span>
-              } 
-            />
+            <div className="px-6 py-4 space-y-1">
+              {[
+                { label: 'Nombre completo', value: `${data?.name || ''} ${data?.apellido || ''}`, icon: '👤' },
+                { label: 'Email', value: data?.email, icon: '✉️' },
+                { label: 'Rol', value: 'Colaborador Comunitario', icon: '🏷️' },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">{item.icon}</span>
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{item.label}</span>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-700 text-right max-w-[55%] truncate">{item.value}</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">🔒</span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Estado</span>
+                </div>
+                {data?.isActive ? (
+                  <span className="flex items-center gap-1.5 px-3 py-1 bg-green-50 rounded-lg">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                    <span className="text-xs font-bold text-green-600">Verificado</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-50 rounded-lg">
+                    <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full" />
+                    <span className="text-xs font-bold text-yellow-600">Pendiente</span>
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -232,67 +203,27 @@ export default function Welcome() {
   );
 }
 
-/* ========== COMPONENTES ========== */
-
-function StatCard({ icon, title, value, subtitle, gradient, iconBg }) {
-  return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-      <div className="flex items-start justify-between mb-4">
-        <div className={`${iconBg} p-3 rounded-xl`}>
-          {icon}
-        </div>
-        <div className={`px-3 py-1 bg-gradient-to-r ${gradient} text-white text-xs font-bold rounded-full`}>
-          +{value}
-        </div>
-      </div>
-      
-      <h3 className="text-gray-600 font-medium mb-1">{title}</h3>
-      <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
-      <p className="text-sm text-gray-500">{subtitle}</p>
-    </div>
-  );
-}
-
-function ActionButton({ icon, label, description, href, color }) {
+function StatCard({ icon, label, value, color }) {
   const colors = {
-    blue: 'from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700',
-    purple: 'from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700',
-    green: 'from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700',
-    orange: 'from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700'
+    purple: { bg: 'bg-purple-50', text: 'text-purple-600', bar: 'bg-purple-500' },
+    blue: { bg: 'bg-blue-50', text: 'text-blue-600', bar: 'bg-blue-500' },
+    green: { bg: 'bg-green-50', text: 'text-green-600', bar: 'bg-green-500' },
   };
+  const c = colors[color];
 
   return (
-    <Link
-      href={href}
-      className={`
-        group relative overflow-hidden
-        bg-gradient-to-br ${colors[color]}
-        text-white rounded-2xl shadow-lg
-        p-6 
-        hover:shadow-2xl hover:scale-105
-        transition-all duration-300
-      `}
-    >
-      <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-500"></div>
-      
-      <div className="relative z-10 flex flex-col items-center text-center gap-3">
-        <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm group-hover:scale-110 transition-transform duration-300">
+    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+      <div className="flex items-center justify-between mb-4">
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${c.bg} ${c.text}`}>
           {icon}
         </div>
-        <div>
-          <p className="font-bold text-base mb-1">{label}</p>
-          <p className="text-xs text-white/80">{description}</p>
-        </div>
+        <span className={`text-xs font-bold ${c.text}`}>Total</span>
       </div>
-    </Link>
-  );
-}
-
-function InfoItem({ label, value }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-sm text-gray-500 font-medium">{label}</span>
-      <span className="text-gray-800 font-semibold">{value}</span>
+      <p className="text-3xl font-bold text-gray-800 mb-1">{value}</p>
+      <p className="text-xs text-gray-400 mb-3">{label}</p>
+      <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`h-full ${c.bar} rounded-full`} style={{ width: value > 0 ? '100%' : '0%', transition: 'width 0.8s ease' }} />
+      </div>
     </div>
   );
 }
