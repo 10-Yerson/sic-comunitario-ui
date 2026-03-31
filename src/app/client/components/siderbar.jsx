@@ -12,6 +12,9 @@ import { MdDashboard } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 
+import { Home, CalendarPlus, LayoutDashboard, UserCircle, LogOut } from 'lucide-react';
+
+
 export default function UserPanel() {
   const router = useRouter();
   const pathname = usePathname();
@@ -24,8 +27,8 @@ export default function UserPanel() {
         <a
           href={href}
           className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group
-            ${isActive 
-              ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg" 
+            ${isActive
+              ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
               : "text-gray-600 hover:bg-gray-100 hover:text-green-600"
             }`}
         >
@@ -89,7 +92,7 @@ export default function UserPanel() {
       <div className="bg-gray-100 dark:bg-gray-900 flex-1">
         {/* Menu Desktop */}
         <nav className="w-full hidden md:flex md:w-64 md:flex-col bg-white fixed md:top-0 md:left-0 md:h-screen shadow-xl border-r border-gray-200 z-50">
-          
+
           {/* Logo Section */}
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center gap-3">
@@ -128,14 +131,40 @@ export default function UserPanel() {
           </div>
         </nav>
 
+
+
         {/* Menu Mobile */}
-        <nav className="w-full flex justify-around p-3 fixed bottom-0 md:hidden z-50 bg-white shadow-lg border-t border-gray-200">
-          <ul className="flex justify-around w-full">
-            <NavItems href="/client/event" Icon={RiCalendarEventFill} />
-            <NavItems href="/client/gestion" Icon={MdDashboard} />
-            <NavItems href="/client" Icon={HiHome} />
-            <NavItems href="/client/perfil" Icon={FaUserCircle} />
-            <NavItems Icon={RiLogoutCircleRLine} onClick={handleLogout} />
+        <nav className="fixed bottom-0 left-0 right-0 md:hidden z-50 bg-white border-t border-gray-100 shadow-2xl">
+          <ul className="flex items-center justify-around px-2 py-2">
+            {[
+              { href: '/client', Icon: Home, label: 'Inicio' },
+              { href: '/client/event', Icon: CalendarPlus, label: 'Crear' },
+              { href: '/client/gestion', Icon: LayoutDashboard, label: 'Gestión' },
+              { href: '/client/perfil', Icon: UserCircle, label: 'Perfil' },
+            ].map(({ href, Icon, label }) => {
+              const isActive = pathname === href;
+              return (
+                <li key={href}>
+                  <a href={href} className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all">
+                    <div className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 ${isActive ? 'bg-green-600 text-white shadow-lg shadow-green-200 scale-110' : 'text-gray-400'}`}>
+                      <Icon size={20} strokeWidth={1.5} />
+                    </div>
+                    <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'text-green-600' : 'text-gray-400'}`}>
+                      {label}
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+
+            <li>
+              <button onClick={handleLogout} className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all">
+                <div className="w-10 h-10 flex items-center justify-center rounded-xl text-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200">
+                  <LogOut size={20} strokeWidth={1.5} />
+                </div>
+                <span className="text-[10px] font-semibold text-red-400">Salir</span>
+              </button>
+            </li>
           </ul>
         </nav>
       </div>
