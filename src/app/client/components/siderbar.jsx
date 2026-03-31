@@ -3,8 +3,6 @@
 import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import axios from '@/utils/axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 import { HiHome } from "react-icons/hi";
 import { RiCalendarEventFill, RiLogoutCircleRLine } from "react-icons/ri";
@@ -67,23 +65,9 @@ export default function UserPanel() {
   const handleLogout = async () => {
     try {
       await axios.post('/api/auth/logout', {}, { withCredentials: true });
-      toast.success('¡Sesión cerrada exitosamente!', {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
+      router.push('/');
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
-      toast.error('Error al cerrar sesión', {
-        position: "top-right",
-        autoClose: 3000,
-      });
     }
   };
 
@@ -168,25 +152,6 @@ export default function UserPanel() {
           </ul>
         </nav>
       </div>
-
-      {/* Toast Container con diseño personalizado */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
-        toastStyle={{
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        }}
-      />
     </>
   );
 }
