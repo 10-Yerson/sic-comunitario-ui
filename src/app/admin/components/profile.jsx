@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from '@/utils/axios';
 import { toast } from 'react-toastify';
-import { Camera, User, Mail, CreditCard, Calendar, Shield, Loader2, Crown, Settings, CheckCircle2 } from 'lucide-react';
+import { Camera, User, Mail, CreditCard, Calendar, Shield, Loader2, Crown, CheckCircle2 } from 'lucide-react';
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -14,30 +14,26 @@ export default function Profile() {
       const res = await axios.get('/api/admin/profile/me');
       setProfile(res.data);
     } catch (error) {
-      toast.error('❌ Error al cargar perfil');
+      toast.error('Error al cargar perfil');
     }
   };
 
-  useEffect(() => {
-    getProfile();
-  }, []);
+  useEffect(() => { getProfile(); }, []);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     const formData = new FormData();
     formData.append('profileUrl', file);
     setUploading(true);
-
     try {
       await axios.put('/api/admin/profile/me', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('🎉 Foto actualizada correctamente');
+      toast.success('Foto actualizada correctamente');
       getProfile();
     } catch (error) {
-      toast.error('❌ Error al actualizar foto');
+      toast.error('Error al actualizar foto');
     } finally {
       setUploading(false);
     }
@@ -46,188 +42,148 @@ export default function Profile() {
   if (!profile) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Cargando perfil...</p>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+          <p className="text-gray-400 text-sm font-medium">Cargando perfil...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50">
 
-      {/* Patrón de fondo */}
-      <div className="max-w-6xl mx-auto relative z-10">
+      {/* HERO HEADER */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="px-8 py-6">
+          <div className="flex items-center gap-5">
 
-        {/* Header con badge Admin */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full mb-3 font-medium text-sm border border-green-200">
-              <Crown className="w-4 h-4" />
-              Panel de Administrador
+            {/* Avatar */}
+            <div className="relative flex-shrink-0 group">
+              <img
+                src={profile.profileUrl}
+                alt="Perfil"
+                className="w-20 h-20 rounded-2xl object-cover ring-4 ring-gray-100 shadow-sm"
+              />
+              <label className="absolute -bottom-1.5 -right-1.5 w-8 h-8 bg-green-600 hover:bg-green-700 text-white rounded-xl cursor-pointer shadow-md flex items-center justify-center transition-colors">
+                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={uploading} />
+              </label>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900">Mi Perfil</h1>
-          </div>
-          <button className="p-3 bg-white hover:bg-gray-50 rounded-xl border border-gray-200 shadow-sm transition-all group">
-            <Settings className="w-6 h-6 text-gray-600 group-hover:text-green-600 group-hover:rotate-90 transition-all duration-300" />
-          </button>
-        </div>
 
-        {/* Grid Layout */}
+            {/* Info */}
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-xs font-semibold text-green-600 uppercase tracking-widest">Panel de administración</p>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-800">{profile.name} {profile.apellido}</h1>
+              <p className="text-gray-400 text-sm mt-0.5">{profile.email}</p>
+              <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-100">
+                <Crown className="w-3 h-3" />
+                {profile.role.toUpperCase()}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CONTENIDO */}
+      <div className="px-8 py-8">
         <div className="grid lg:grid-cols-3 gap-6">
 
-          {/* Columna 1 - Card de Foto */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+          {/* COLUMNA IZQUIERDA */}
+          <div className="space-y-5">
 
-              {/* Gradiente superior */}
-              <div className="h-24 bg-gradient-to-r from-green-600 to-emerald-600 relative">
-                <div className="absolute inset-0 bg-black/10"></div>
+            {/* Info rápida */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Resumen</p>
+              <div className="space-y-3">
+                {[
+                  { label: 'Eventos', value: 156, color: 'bg-blue-50 text-blue-600', bar: 'bg-blue-400' },
+                  { label: 'Usuarios', value: 342, color: 'bg-purple-50 text-purple-600', bar: 'bg-purple-400' },
+                ].map(s => (
+                  <div key={s.label}>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="text-xs text-gray-400 font-medium">{s.label}</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${s.color}`}>{s.value}</span>
+                    </div>
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${s.bar} rounded-full`} style={{ width: '100%', transition: 'width 0.8s ease' }} />
+                    </div>
+                  </div>
+                ))}
               </div>
+            </div>
 
-              {/* Foto de perfil */}
-              <div className="px-6 pb-6 -mt-16 relative">
-                <div className="relative inline-block">
-                  <img
-                    src={profile.profileUrl}
-                    alt="Perfil"
-                    className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-2xl bg-white"
-                  />
-                  <label className="absolute bottom-2 right-2 w-10 h-10 bg-green-600 text-white rounded-xl cursor-pointer shadow-lg hover:bg-green-700 transition-all flex items-center justify-center group">
-                    {uploading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <Camera className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                      disabled={uploading}
-                    />
-                  </label>
-                </div>
-
-                <div className="mt-4">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    {profile.name} {profile.apellido}
-                  </h2>
-                  <p className="text-gray-600 text-sm mt-1">{profile.email}</p>
-
-                  <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-lg mt-3 text-sm font-semibold border border-green-200">
-                    <Shield className="w-4 h-4" />
-                    {profile.role.toUpperCase()}
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-3 text-center border border-blue-100">
-                      <div className="text-2xl font-bold text-gray-900">156</div>
-                      <div className="text-xs text-gray-600 mt-1">Eventos</div>
-                    </div>
-                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-3 text-center border border-purple-100">
-                      <div className="text-2xl font-bold text-gray-900">342</div>
-                      <div className="text-xs text-gray-600 mt-1">Usuarios</div>
-                    </div>
-                  </div>
-                </div>
+            {/* Estado */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Estado de cuenta</p>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-sm font-semibold text-green-600">Cuenta activa</span>
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="w-2 h-2 bg-blue-500 rounded-full" />
+                <span className="text-sm font-semibold text-blue-600">Acceso total</span>
               </div>
             </div>
           </div>
 
-          {/* Columna 2 y 3 - Información */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* COLUMNA DERECHA */}
+          <div className="lg:col-span-2 space-y-5">
 
-            {/* Información Personal */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <User className="w-5 h-5 text-green-600" />
-                Información Personal
-              </h3>
+            {/* Información personal */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-5">
+                <User className="text-gray-400" size={15} />
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Información personal</p>
+              </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 hover:shadow-md transition-all border border-blue-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-md">
-                      <Mail className="w-5 h-5 text-white" />
+              <div className="grid md:grid-cols-2 gap-3">
+                {[
+                  { icon: <Mail size={15} className="text-blue-500" />, bg: 'bg-blue-50', label: 'Correo', value: profile.email },
+                  { icon: <CreditCard size={15} className="text-purple-500" />, bg: 'bg-purple-50', label: 'Cédula', value: profile.cedula || 'No registrada' },
+                  { icon: <User size={15} className="text-green-500" />, bg: 'bg-green-50', label: 'Género', value: profile.genero || 'No especificado' },
+                  { icon: <Calendar size={15} className="text-amber-500" />, bg: 'bg-amber-50', label: 'Miembro desde', value: profile.createdAt ? new Date(profile.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '---' },
+                ].map(item => (
+                  <div key={item.label} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                    <div className={`w-9 h-9 ${item.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                      {item.icon}
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-600 uppercase font-medium">Correo</p>
-                      <p className="text-sm font-semibold text-gray-900">{profile.email}</p>
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-400 font-medium">{item.label}</p>
+                      <p className="text-sm font-semibold text-gray-800 truncate">{item.value}</p>
                     </div>
                   </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 hover:shadow-md transition-all border border-purple-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
-                      <CreditCard className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 uppercase font-medium">Cédula</p>
-                      <p className="text-sm font-semibold text-gray-900">{profile.cedula || 'No registrada'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 hover:shadow-md transition-all border border-green-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-md">
-                      <User className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 uppercase font-medium">Género</p>
-                      <p className="text-sm font-semibold text-gray-900">{profile.genero || 'No especificado'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 hover:shadow-md transition-all border border-orange-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-md">
-                      <Calendar className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 uppercase font-medium">Miembro desde</p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '---'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Privilegios y Permisos */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-green-600" />
-                Privilegios de Administrador
-              </h3>
+            {/* Privilegios */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-5">
+                <Shield className="text-gray-400" size={15} />
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Privilegios de administrador</p>
+              </div>
 
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-2 gap-2">
                 {[
                   'Gestión completa de usuarios',
                   'Crear y editar eventos',
                   'Administrar asistencias',
                   'Generar reportes',
                   'Configuración del sistema',
-                  'Acceso a estadísticas'
-                ].map((privilege, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-green-50 hover:border-green-200 transition-all">
-                    <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{privilege}</span>
+                  'Acceso a estadísticas',
+                ].map((privilege, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-green-50 hover:border-green-100 border border-transparent transition-all">
+                    <CheckCircle2 className="text-green-500 flex-shrink-0" size={15} />
+                    <span className="text-xs font-medium text-gray-600">{privilege}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
