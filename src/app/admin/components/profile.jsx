@@ -92,7 +92,7 @@ export default function Profile() {
                   <img
                     src={profile.profileUrl}
                     alt="Perfil"
-                    className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-2xl"
+                    className="w-32 h-32 rounded-2xl object-cover border-4 border-white shadow-2xl bg-white"
                   />
                   <label className="absolute bottom-2 right-2 w-10 h-10 bg-green-600 text-white rounded-xl cursor-pointer shadow-lg hover:bg-green-700 transition-all flex items-center justify-center group">
                     {uploading ? (

@@ -217,15 +217,15 @@ export default function Usuarios() {
 
                         <button
                             onClick={() => setModalOpen(false)}
-                            className="absolute top-4 right-4 text-white/80 hover:text-red-400 text-xl"
+                            className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200 transition duration-200 shadow-sm"
                         >
-                            ✖
+                            ✕
                         </button>
 
                         <div className="flex justify-center -mt-12">
                             <img
                                 src={selectedUser.profilePicture}
-                                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg bg-white"
                             />
                         </div>
 

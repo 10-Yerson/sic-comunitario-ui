@@ -4,19 +4,11 @@ import { useEffect, useState } from 'react';
 import axios from '@/utils/axios';
 import Link from 'next/link';
 import {
-  FiUsers,
-  FiUserCheck,
-  FiCalendar,
-  FiUpload,
-  FiPlusCircle
+  FiUsers, FiUserCheck, FiCalendar, FiUpload, FiPlusCircle, FiChevronRight
 } from 'react-icons/fi';
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    encargados: 0,
-    comuneros: 0,
-    eventos: 0
-  });
+  const [stats, setStats] = useState({ encargados: 0, comuneros: 0, eventos: 0 });
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -26,7 +18,6 @@ export default function Dashboard() {
           axios.get('/api/resident'),
           axios.get('/api/event')
         ]);
-
         setStats({
           encargados: usersRes.data.length || 0,
           comuneros: residentsRes.data.length || 0,
@@ -36,96 +27,112 @@ export default function Dashboard() {
         console.error('Error cargando estadísticas:', error);
       }
     };
-
     fetchStats();
   }, []);
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      {/* HEADER */}
-      <header className="mb-10 text-center">
-        <h1 className="text-4xl font-extrabold text-gray-800">
-          Panel de Administración
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Sistema Integral Comunitario (SIC)
-        </p>
-      </header>
+    <div className="min-h-screen bg-gray-50 px-6 py-8">
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      {/* HEADER */}
+      <div className="mb-8">
+        <p className="text-xs font-semibold text-green-600 uppercase tracking-widest mb-1">Sistema Integral Comunitario</p>
+        <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
+        <p className="text-gray-400 text-sm mt-0.5">Resumen general del sistema</p>
+      </div>
+
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         <StatCard
-          icon={<FiUsers size={32} />}
+          icon={<FiUsers size={20} />}
           title="Encargados"
           value={stats.encargados}
           href="/admin/secret"
+          color="bg-blue-50 text-blue-600"
+          bar="bg-blue-400"
+          emoji="👥"
         />
-
         <StatCard
-          icon={<FiUserCheck size={32} />}
+          icon={<FiUserCheck size={20} />}
           title="Habitantes"
           value={stats.comuneros}
           href="/admin/users"
+          color="bg-emerald-50 text-emerald-600"
+          bar="bg-emerald-400"
+          emoji="🏘️"
         />
-
         <StatCard
-          icon={<FiCalendar size={32} />}
+          icon={<FiCalendar size={20} />}
           title="Eventos"
           value={stats.eventos}
           href="/admin/event"
+          color="bg-purple-50 text-purple-600"
+          bar="bg-purple-400"
+          emoji="📅"
         />
-      </section>
+      </div>
 
-      <section className="bg-white p-6 rounded-xl shadow border">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-          Acciones rápidas
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* ACCIONES RÁPIDAS */}
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <div className="flex items-center gap-2 mb-5">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Acciones rápidas</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <QuickAction
-            icon={<FiUpload />}
-            text="Importar Habitantes (Excel)"
+            icon={<FiUpload size={18} />}
+            text="Importar Habitantes"
+            desc="Carga masiva desde Excel"
             href="/admin/upload"
-            color="bg-[#31DCB7]"
+            color="from-teal-500 to-emerald-500"
           />
-
           <QuickAction
-            icon={<FiPlusCircle />}
-            text="Crear usuario (Secretario / Colaborador)"
+            icon={<FiPlusCircle size={18} />}
+            text="Crear Usuario"
+            desc="Secretario o Colaborador"
             href="/admin/colaborador"
-            color="bg-[#5060BC]"
+            color="from-indigo-500 to-blue-600"
           />
         </div>
-      </section>
+      </div>
     </div>
   );
 }
 
-function StatCard({ icon, title, value, href }) {
+function StatCard({ icon, title, value, href, color, bar, emoji }) {
   return (
     <Link href={href}>
-      <div className="cursor-pointer bg-white p-6 rounded-xl shadow border hover:shadow-lg transition">
-        <div className="flex items-center gap-4">
-          <div className="p-4 bg-gray-100 rounded-full text-gray-700">
-            {icon}
+      <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group">
+        <div className="flex items-center justify-between mb-4">
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${color}`}>{title}</span>
+          <span className="text-xl">{emoji}</span>
+        </div>
+        <p className="text-3xl font-bold text-gray-800 mb-1">{value}</p>
+        <div className="flex items-center justify-between">
+          <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden mr-3">
+            <div className={`h-full ${bar} rounded-full`} style={{ width: value > 0 ? '100%' : '0%', transition: 'width 0.8s ease' }} />
           </div>
-          <div>
-            <p className="text-sm text-gray-500">{title}</p>
-            <p className="text-3xl font-bold text-gray-800">{value}</p>
-          </div>
+          <FiChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 transition-colors" />
         </div>
       </div>
     </Link>
   );
 }
 
-function QuickAction({ icon, text, href, color }) {
+function QuickAction({ icon, text, desc, href, color }) {
   return (
     <Link href={href}>
-      <div
-        className={`flex items-center gap-3 text-white px-6 py-4 rounded-xl shadow cursor-pointer hover:opacity-90 ${color}`}
-      >
-        {icon}
-        <span className="font-medium">{text}</span>
+      <div className={`bg-gradient-to-br ${color} text-white rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+              {icon}
+            </div>
+            <div>
+              <p className="font-bold text-sm">{text}</p>
+              <p className="text-white/70 text-xs mt-0.5">{desc}</p>
+            </div>
+          </div>
+          <FiChevronRight size={16} className="text-white/50 group-hover:text-white transition-colors" />
+        </div>
       </div>
     </Link>
   );
