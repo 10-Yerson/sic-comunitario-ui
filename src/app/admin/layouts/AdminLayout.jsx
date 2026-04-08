@@ -11,7 +11,7 @@ export default function AdminLayout({ children }) {
           w-full 
           lg:ml-72 
           min-h-screen
-          pt-16 lg:pt-0
+          pb-20 lg:pb-0
           lg:px-0
         ">
           {children}

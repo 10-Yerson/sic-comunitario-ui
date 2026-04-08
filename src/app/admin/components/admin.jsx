@@ -16,6 +16,7 @@ export default function AdminInfo() {
       setLoading(true);
       const { data } = await axios.get('/api/admin');
       setAdmins(data);
+      console.log(data)
     } catch (error) {
       console.error(error);
       toast.error('Error al cargar administradores');
@@ -44,6 +45,25 @@ export default function AdminInfo() {
     }
   };
 
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [loadingAdmin, setLoadingAdmin] = useState(false);
+
+  const handleView = async (id) => {
+    try {
+      setLoadingAdmin(true);
+      const { data } = await axios.get(`/api/admin/${id}`);
+      setSelectedAdmin(data);
+      console.log('data id admin', data);
+      setShowModal(true);
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al obtener información');
+    } finally {
+      setLoadingAdmin(false);
+    }
+  };
+
   const filteredAdmins = admins.filter((admin) =>
     admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     admin.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -64,7 +84,7 @@ export default function AdminInfo() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Header */}
         <div className="mb-8">
           <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full mb-4 font-medium text-sm">
@@ -195,15 +215,14 @@ export default function AdminInfo() {
                       <td className="px-6 py-4">
                         <div className="flex justify-center">
                           <button
-                            onClick={() => handleDelete(admin._id, admin.name)}
-                            disabled={deletingId === admin._id}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-                            title="Eliminar administrador"
+                            onClick={() => handleView(admin._id)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all group"
+                            title="Ver administrador"
                           >
-                            {deletingId === admin._id ? (
+                            {loadingAdmin && selectedAdmin?._id === admin._id ? (
                               <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
-                              <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                              <User className="w-5 h-5 group-hover:scale-110 transition-transform" />
                             )}
                           </button>
                         </div>
@@ -222,6 +241,86 @@ export default function AdminInfo() {
         </div>
 
       </div>
+
+      {showModal && selectedAdmin && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 px-4">
+
+          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-fadeIn">
+
+            {/* Header */}
+            <div className="p-6 border-b flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <img
+                  src={selectedAdmin.profileUrl}
+                  className="w-16 h-16 rounded-full object-cover border"
+                />
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {selectedAdmin.name} {selectedAdmin.apellido}
+                  </h2>
+                  <p className="text-sm text-gray-500">{selectedAdmin.email}</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-gray-700 text-lg"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Card */}
+              <div className="bg-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Nombre</p>
+                <p className="font-medium text-gray-900">{selectedAdmin.name}</p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Apellido</p>
+                <p className="font-medium text-gray-900">{selectedAdmin.apellido}</p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Cédula</p>
+                <p className="font-medium text-gray-900">{selectedAdmin.cedula}</p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Género</p>
+                <p className="font-medium text-gray-900">{selectedAdmin.genero}</p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">Rol</p>
+                <p className="font-medium text-gray-900 uppercase">{selectedAdmin.role}</p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 mb-1">ID</p>
+                <p className="font-medium text-gray-900 text-xs break-all">
+                  {selectedAdmin._id}
+                </p>
+              </div>
+
+            </div>
+
+            {/* Footer */}
+            <div className="border-t px-6 py-4 flex justify-end">
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-800 transition"
+              >
+                Cerrar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
