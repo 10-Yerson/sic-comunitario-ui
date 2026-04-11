@@ -77,7 +77,7 @@ export default function Usuarios() {
       setModalOpen(false);
       toast.success('Residente eliminado correctamente');
     } catch (err) {
-      toast.error('No se pudo eliminar el residente');
+      toast.error(err.response?.data?.msg || 'No se pudo eliminar el residente');
     }
   };
 
@@ -103,7 +103,7 @@ export default function Usuarios() {
   const inputCls = 'w-full px-3 py-2.5 text-sm border-2 border-gray-100 bg-gray-50 rounded-xl focus:outline-none focus:border-green-300 focus:bg-white transition-all placeholder:text-gray-300';
 
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-8">
+    <div className="min-h-screen bg-gray-50 px-4 md:px-6 py-8">
 
       {/* HEADER */}
       <div className="mb-6">
@@ -135,7 +135,7 @@ export default function Usuarios() {
         </div>
       </div>
 
-      {/* TABLE */}
+      {/* TABLE / CARDS */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         {loading && !modalOpen ? (
           <div className="flex items-center justify-center py-16">
@@ -143,72 +143,101 @@ export default function Usuarios() {
           </div>
         ) : error ? (
           <div className="text-center py-10 text-red-500 text-sm">{error}</div>
+        ) : userInfo.length === 0 ? (
+          <div className="text-center py-14">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-4xl">👥</span>
+              <p className="text-gray-400 text-sm font-medium">No se encontraron residentes</p>
+            </div>
+          </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Residente</th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Lote</th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Correo</th>
-                <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">Teléfono</th>
-                <th className="px-4 py-3.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Estado</th>
-                <th className="px-4 py-3.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Acción</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {userInfo.length === 0 ? (
-                <tr key="empty">
-                  <td colSpan="6" className="text-center py-14">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-4xl">👥</span>
-                      <p className="text-gray-400 text-sm font-medium">No se encontraron residentes</p>
+          <>
+            {/* CARDS — móvil */}
+            <div className="md:hidden divide-y divide-gray-50">
+              {userInfo.map((user) => (
+                <div key={user._id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors">
+                  <img
+                    src={user.profilePicture}
+                    className="w-11 h-11 rounded-xl object-cover flex-shrink-0 ring-2 ring-gray-100"
+                    alt={user.name}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-800 text-sm">{user.name} {user.apellido}</p>
+                    <p className="text-xs text-gray-400 font-mono">CC: {user.cedula}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-bold rounded-md">{user.lote}</span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-bold rounded-md">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full" /> Activo
+                      </span>
                     </div>
-                  </td>
-                </tr>
-              ) : userInfo.map((user) => (
-                <tr key={user._id} className="hover:bg-gray-50/60 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <img src={user.profilePicture} className="w-10 h-10 rounded-xl object-cover flex-shrink-0 ring-2 ring-gray-100" alt={user.name} />
-                      <div>
-                        <p className="font-semibold text-gray-800 text-sm">{user.name} {user.apellido}</p>
-                        <p className="text-xs text-gray-400 font-mono">CC: {user.cedula}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-lg">{user.lote}</span>
-                  </td>
-                  <td className="px-4 py-4 text-gray-500 text-xs hidden md:table-cell">{user.email}</td>
-                  <td className="px-4 py-4 text-gray-500 text-xs hidden md:table-cell font-mono">{user.telefono}</td>
-                  <td className="px-4 py-4 text-center">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg">
-                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                      Activo
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <button
-                      onClick={() => openModal(user._id)}
-                      className="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all"
-                    >
-                      Ver perfil
-                    </button>
-                  </td>
-                </tr>
+                  </div>
+                  <button
+                    onClick={() => openModal(user._id)}
+                    className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all"
+                  >
+                    Ver
+                  </button>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+
+            {/* TABLE — desktop */}
+            <table className="hidden md:table w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Residente</th>
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Lote</th>
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Correo</th>
+                  <th className="px-4 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Teléfono</th>
+                  <th className="px-4 py-3.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Estado</th>
+                  <th className="px-4 py-3.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">Acción</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {userInfo.map((user) => (
+                  <tr key={user._id} className="hover:bg-gray-50/60 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <img src={user.profilePicture} className="w-10 h-10 rounded-xl object-cover flex-shrink-0 ring-2 ring-gray-100" alt={user.name} />
+                        <div>
+                          <p className="font-semibold text-gray-800 text-sm">{user.name} {user.apellido}</p>
+                          <p className="text-xs text-gray-400 font-mono">CC: {user.cedula}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-lg">{user.lote}</span>
+                    </td>
+                    <td className="px-4 py-4 text-gray-500 text-xs">{user.email}</td>
+                    <td className="px-4 py-4 text-gray-500 text-xs font-mono">{user.telefono}</td>
+                    <td className="px-4 py-4 text-center">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Activo
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <button
+                        onClick={() => openModal(user._id)}
+                        className="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all"
+                      >
+                        Ver perfil
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
 
       {/* MODAL VER */}
       {modalOpen && selectedUser && !editMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
             {/* Header */}
-            <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-7 py-5">
+            <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-5 flex-shrink-0">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Perfil del residente</p>
@@ -216,7 +245,7 @@ export default function Usuarios() {
                   <p className="text-slate-400 text-xs mt-1">{selectedUser.email}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <img src={selectedUser.profilePicture} className="w-12 h-12 rounded-xl object-cover ring-2 ring-white/20" />
+                  <img src={selectedUser.profilePicture} className="w-12 h-12 rounded-xl object-cover" />
                   <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
                     <FiX size={16} />
                   </button>
@@ -224,9 +253,9 @@ export default function Usuarios() {
               </div>
             </div>
 
-            {/* Info grid */}
-            <div className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {/* Info grid — scroll */}
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {[
                   { icon: '🪪', label: 'Cédula', value: selectedUser.cedula },
                   { icon: '📞', label: 'Teléfono', value: selectedUser.telefono },
@@ -235,8 +264,8 @@ export default function Usuarios() {
                   { icon: '🎂', label: 'Nacimiento', value: selectedUser.fechaNacimiento?.slice(0, 10) },
                   { icon: '📍', label: 'Dirección', value: selectedUser.direccion },
                 ].map(item => (
-                  <div key={item.label} className="bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center gap-1.5 mb-1.5">
+                  <div key={item.label} className="bg-gray-50 rounded-xl p-3.5">
+                    <div className="flex items-center gap-1.5 mb-1">
                       <span className="text-sm">{item.icon}</span>
                       <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{item.label}</p>
                     </div>
@@ -247,28 +276,18 @@ export default function Usuarios() {
             </div>
 
             {/* Footer */}
-
-            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center flex-shrink-0">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-100">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Activo
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
               </span>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
-                >
+                <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
                   Cerrar
                 </button>
-                <button
-                  onClick={() => setEditMode(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
-                >
+                <button onClick={() => setEditMode(true)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
                   <FiEdit size={13} /> Editar
                 </button>
-                <button
-                  onClick={handleDeleteUser}
-                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all border border-red-100"
-                >
+                <button onClick={handleDeleteUser} className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all border border-red-100">
                   <FiTrash2 size={13} /> Eliminar
                 </button>
               </div>
@@ -280,10 +299,10 @@ export default function Usuarios() {
       {/* MODAL EDITAR */}
       {modalOpen && selectedUser && editMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
             {/* Header */}
-            <div className="bg-gradient-to-r from-slate-700 to-slate-600 px-7 py-5">
+            <div className="bg-gradient-to-r from-slate-700 to-slate-600 px-6 py-5 flex-shrink-0">
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Modo edición</p>
@@ -291,7 +310,7 @@ export default function Usuarios() {
                   <p className="text-slate-400 text-xs mt-1">Modifica los datos del residente</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <img src={selectedUser.profilePicture} className="w-14 h-14 rounded-xl object-cover" />
+                  <img src={selectedUser.profilePicture} className="w-12 h-12 rounded-xl object-cover ring-2 ring-white/20" />
                   <button onClick={() => setEditMode(false)} className="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
                     <FiX size={16} />
                   </button>
@@ -299,8 +318,8 @@ export default function Usuarios() {
               </div>
             </div>
 
-            {/* Form */}
-            <div className="p-6">
+            {/* Form — scroll */}
+            <div className="p-6 overflow-y-auto flex-1">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { name: 'name', label: 'Nombre', type: 'text' },
@@ -321,7 +340,6 @@ export default function Usuarios() {
                     />
                   </div>
                 ))}
-
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Género</label>
                   <select name="genero" value={formData.genero || ''} onChange={handleChange} className={inputCls}>
@@ -331,7 +349,6 @@ export default function Usuarios() {
                     <option value="Otro">Otro</option>
                   </select>
                 </div>
-
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Dirección</label>
                   <input type="text" name="direccion" value={formData.direccion || ''} onChange={handleChange} className={inputCls} />
@@ -340,17 +357,11 @@ export default function Usuarios() {
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-2">
-              <button
-                onClick={() => setEditMode(false)}
-                className="px-5 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
-              >
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-2 flex-shrink-0">
+              <button onClick={() => setEditMode(false)} className="px-5 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all">
                 Cancelar
               </button>
-              <button
-                onClick={handleUpdateUser}
-                className="flex items-center gap-2 px-6 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 rounded-xl transition-all"
-              >
+              <button onClick={handleUpdateUser} className="flex items-center gap-2 px-6 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 rounded-xl transition-all">
                 ✓ Guardar cambios
               </button>
             </div>
