@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import axios from '@/utils/axios';
-import { FiEdit, FiTrash2, FiSearch, FiUsers } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import { FiEdit, FiTrash2, FiSearch, FiUsers, FiX } from 'react-icons/fi';
 
 export default function Usuarios() {
   const [userInfo, setUserInfo] = useState([]);
@@ -17,8 +18,7 @@ export default function Usuarios() {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (optionsMenuRef.current && !optionsMenuRef.current.contains(e.target)) {
-      }
+      if (optionsMenuRef.current && !optionsMenuRef.current.contains(e.target)) { }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -58,9 +58,11 @@ export default function Usuarios() {
       setModalOpen(true);
       const res = await axios.get(`/api/resident/${userId}`);
       setSelectedUser(res.data);
+      setFormData(res.data);
+      setEditMode(false);
     } catch (error) {
       console.error(error);
-      alert('No se pudo cargar el perfil');
+      toast.error('No se pudo cargar el perfil');
       setModalOpen(false);
     } finally {
       setLoading(false);
@@ -73,9 +75,9 @@ export default function Usuarios() {
       await axios.delete(`/api/resident/${selectedUser._id}`);
       setUserInfo(userInfo.filter(u => u._id !== selectedUser._id));
       setModalOpen(false);
-      alert('Usuario eliminado correctamente');
+      toast.success('Residente eliminado correctamente');
     } catch (err) {
-      alert('No se pudo eliminar el usuario');
+      toast.error('No se pudo eliminar el residente');
     }
   };
 
@@ -87,14 +89,18 @@ export default function Usuarios() {
   const handleUpdateUser = async () => {
     try {
       const res = await axios.put(`/api/resident/${selectedUser._id}`, formData);
-      setUserInfo(userInfo.map(u => u._id === selectedUser._id ? res.data : u));
-      setSelectedUser(res.data);
+      const updatedResident = res.data.resident;
+      setUserInfo(userInfo.map(u => u._id === selectedUser._id ? updatedResident : u));
+      setSelectedUser(updatedResident);
+      setFormData(updatedResident);
       setEditMode(false);
-      alert('Usuario actualizado correctamente');
+      toast.success('Residente actualizado correctamente');
     } catch (error) {
-      alert('Error al actualizar usuario');
+      toast.error('Error al actualizar el residente');
     }
   };
+
+  const inputCls = 'w-full px-3 py-2.5 text-sm border-2 border-gray-100 bg-gray-50 rounded-xl focus:outline-none focus:border-green-300 focus:bg-white transition-all placeholder:text-gray-300';
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-8">
@@ -131,7 +137,7 @@ export default function Usuarios() {
 
       {/* TABLE */}
       <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-        {loading ? (
+        {loading && !modalOpen ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
           </div>
@@ -151,7 +157,7 @@ export default function Usuarios() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {userInfo.length === 0 ? (
-                <tr>
+                <tr key="empty">
                   <td colSpan="6" className="text-center py-14">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">👥</span>
@@ -159,81 +165,193 @@ export default function Usuarios() {
                     </div>
                   </td>
                 </tr>
-              ) : (
-                userInfo.map((user) => (
-                  <tr key={user._id} className="hover:bg-gray-50/60 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={user.profilePicture}
-                          className="w-10 h-10 rounded-xl object-cover flex-shrink-0 ring-2 ring-gray-100"
-                          alt={user.name}
-                        />
-                        <div>
-                          <p className="font-semibold text-gray-800 text-sm">{user.name} {user.apellido}</p>
-                          <p className="text-xs text-gray-400 font-mono">CC: {user.cedula}</p>
-                        </div>
+              ) : userInfo.map((user) => (
+                <tr key={user._id} className="hover:bg-gray-50/60 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <img src={user.profilePicture} className="w-10 h-10 rounded-xl object-cover flex-shrink-0 ring-2 ring-gray-100" alt={user.name} />
+                      <div>
+                        <p className="font-semibold text-gray-800 text-sm">{user.name} {user.apellido}</p>
+                        <p className="text-xs text-gray-400 font-mono">CC: {user.cedula}</p>
                       </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-lg">{user.lote}</span>
-                    </td>
-                    <td className="px-4 py-4 text-gray-500 text-xs hidden md:table-cell">{user.email}</td>
-                    <td className="px-4 py-4 text-gray-500 text-xs hidden md:table-cell font-mono">{user.telefono}</td>
-                    <td className="px-4 py-4 text-center">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg">
-                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                        Activo
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <button
-                        onClick={() => openModal(user._id)}
-                        className="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all hover:text-gray-800"
-                      >
-                        Ver perfil
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-lg">{user.lote}</span>
+                  </td>
+                  <td className="px-4 py-4 text-gray-500 text-xs hidden md:table-cell">{user.email}</td>
+                  <td className="px-4 py-4 text-gray-500 text-xs hidden md:table-cell font-mono">{user.telefono}</td>
+                  <td className="px-4 py-4 text-center">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg">
+                      <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                      Activo
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <button
+                      onClick={() => openModal(user._id)}
+                      className="px-4 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all"
+                    >
+                      Ver perfil
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}
       </div>
 
-      {/* MODAL — sin cambios */}
-      {modalOpen && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl relative overflow-hidden">
-            <div className="h-24 bg-gradient-to-r from-blue-500 to-indigo-600" />
-            <button
-              onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200 transition duration-200 shadow-sm"
-            >✕</button>
-            <div className="flex justify-center -mt-12">
-              <img src={selectedUser.profilePicture} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg bg-white" />
+      {/* MODAL VER */}
+      {modalOpen && selectedUser && !editMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-7 py-5">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Perfil del residente</p>
+                  <h2 className="text-white text-xl font-bold">{selectedUser.name} {selectedUser.apellido}</h2>
+                  <p className="text-slate-400 text-xs mt-1">{selectedUser.email}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img src={selectedUser.profilePicture} className="w-12 h-12 rounded-xl object-cover ring-2 ring-white/20" />
+                  <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+                    <FiX size={16} />
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="text-center mt-2 px-6">
-              <h2 className="text-xl font-bold text-gray-800">{selectedUser.name} {selectedUser.apellido}</h2>
-              <p className="text-gray-500 text-sm">{selectedUser.email}</p>
+
+            {/* Info grid */}
+            <div className="p-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                  { icon: '🪪', label: 'Cédula', value: selectedUser.cedula },
+                  { icon: '📞', label: 'Teléfono', value: selectedUser.telefono },
+                  { icon: '🏠', label: 'Lote', value: selectedUser.lote },
+                  { icon: '⚧', label: 'Género', value: selectedUser.genero },
+                  { icon: '🎂', label: 'Nacimiento', value: selectedUser.fechaNacimiento?.slice(0, 10) },
+                  { icon: '📍', label: 'Dirección', value: selectedUser.direccion },
+                ].map(item => (
+                  <div key={item.label} className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <span className="text-sm">{item.icon}</span>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{item.label}</p>
+                    </div>
+                    <p className="text-sm font-semibold text-gray-800 truncate">{item.value || '—'}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 px-8 text-sm text-gray-700">
-              <div className="flex gap-3"><span className="text-blue-500">🪪</span><div><p className="text-gray-500">Cédula</p><p className="font-semibold">{selectedUser.cedula}</p></div></div>
-              <div className="flex gap-3"><span className="text-blue-500">📞</span><div><p className="text-gray-500">Teléfono</p><p className="font-semibold">{selectedUser.telefono}</p></div></div>
-              <div className="flex gap-3"><span className="text-blue-500">🏠</span><div><p className="text-gray-500">Lote</p><p className="font-semibold">{selectedUser.lote}</p></div></div>
-              <div className="flex gap-3"><span className="text-blue-500">⚧</span><div><p className="text-gray-500">Género</p><p className="font-semibold">{selectedUser.genero}</p></div></div>
-              <div className="flex gap-3"><span className="text-blue-500">🎂</span><div><p className="text-gray-500">Nacimiento</p><p className="font-semibold">{selectedUser.fechaNacimiento?.slice(0, 10)}</p></div></div>
-              <div className="flex gap-3 md:col-span-2"><span className="text-blue-500">📍</span><div><p className="text-gray-500">Dirección</p><p className="font-semibold">{selectedUser.direccion}</p></div></div>
+
+            {/* Footer */}
+
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg border border-green-100">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Activo
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
+                >
+                  Cerrar
+                </button>
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
+                >
+                  <FiEdit size={13} /> Editar
+                </button>
+                <button
+                  onClick={handleDeleteUser}
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all border border-red-100"
+                >
+                  <FiTrash2 size={13} /> Eliminar
+                </button>
+              </div>
             </div>
-            <div className="flex justify-end items-center gap-4 px-8 py-4 mt-6 border-t bg-gray-50/60">
-              <button title="Editar" className="group relative flex items-center justify-center w-11 h-11 rounded-full bg-yellow-500/90 text-white shadow-md hover:bg-yellow-500 hover:scale-105 transition-all duration-200">
-                <FiEdit size={20} />
-                <span className="absolute -top-9 scale-0 group-hover:scale-100 rounded-md bg-gray-900 text-white text-xs px-2 py-1 transition-transform">Editar</span>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL EDITAR */}
+      {modalOpen && selectedUser && editMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-slate-700 to-slate-600 px-7 py-5">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Modo edición</p>
+                  <h2 className="text-white text-xl font-bold">{selectedUser.name} {selectedUser.apellido}</h2>
+                  <p className="text-slate-400 text-xs mt-1">Modifica los datos del residente</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img src={selectedUser.profilePicture} className="w-14 h-14 rounded-xl object-cover" />
+                  <button onClick={() => setEditMode(false)} className="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+                    <FiX size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Form */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { name: 'name', label: 'Nombre', type: 'text' },
+                  { name: 'apellido', label: 'Apellido', type: 'text' },
+                  { name: 'cedula', label: 'Cédula', type: 'text' },
+                  { name: 'telefono', label: 'Teléfono', type: 'text' },
+                  { name: 'lote', label: 'Lote', type: 'text' },
+                  { name: 'fechaNacimiento', label: 'Nacimiento', type: 'date' },
+                ].map(field => (
+                  <div key={field.name}>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">{field.label}</label>
+                    <input
+                      type={field.type}
+                      name={field.name}
+                      value={field.name === 'fechaNacimiento' ? formData[field.name]?.slice(0, 10) || '' : formData[field.name] || ''}
+                      onChange={handleChange}
+                      className={inputCls}
+                    />
+                  </div>
+                ))}
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Género</label>
+                  <select name="genero" value={formData.genero || ''} onChange={handleChange} className={inputCls}>
+                    <option value="">Seleccione</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Dirección</label>
+                  <input type="text" name="direccion" value={formData.direccion || ''} onChange={handleChange} className={inputCls} />
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-2">
+              <button
+                onClick={() => setEditMode(false)}
+                className="px-5 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
+              >
+                Cancelar
               </button>
-              <button onClick={handleDeleteUser} title="Eliminar" className="group relative flex items-center justify-center w-11 h-11 rounded-full bg-red-500/90 text-white shadow-md hover:bg-red-500 hover:scale-105 transition-all duration-200">
-                <FiTrash2 size={20} />
-                <span className="absolute -top-9 scale-0 group-hover:scale-100 rounded-md bg-gray-900 text-white text-xs px-2 py-1 transition-transform">Eliminar</span>
+              <button
+                onClick={handleUpdateUser}
+                className="flex items-center gap-2 px-6 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 rounded-xl transition-all"
+              >
+                ✓ Guardar cambios
               </button>
             </div>
           </div>
